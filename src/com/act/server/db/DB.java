@@ -382,6 +382,11 @@ public class DB{
 	
 	public static Connection getConnection(){
 		
+<<<<<<< HEAD
+=======
+		
+		
+>>>>>>> refs/remotes/origin/master
 		Connection conn = null;
 		try {
 			Class.forName(driver).newInstance();
