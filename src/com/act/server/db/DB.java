@@ -382,19 +382,6 @@ public class DB{
 	
 	public static Connection getConnection(){
 		
-		String url = "jdbc:mysql://localhost:3306/";
-		String dbName = "act2c1";
-		String driver = "com.mysql.jdbc.Driver";
-		String userName = "root"; 
-		String password = "geena1@#$";
-		
-		
-//		String url = "jdbc:mysql://localhost:3306/";
-//		String dbName = "ActAceTest1";//"act2c1";
-//		String driver = "com.mysql.jdbc.Driver";
-//		String userName = "root"; 
-//		String password = "Raja123@#$";//"geena1@#$";
-		
 		Connection conn = null;
 		try {
 			Class.forName(driver).newInstance();
