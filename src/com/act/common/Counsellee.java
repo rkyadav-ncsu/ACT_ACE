@@ -27,6 +27,9 @@ public class Counsellee implements Serializable{
 	//Others
 	private String parentOrg;
 	private String location;
+	private String dob;
+	private String gender;
+	private String dtTerm;
 
 	public String getCaseNumber() {
 		return caseNumber;
@@ -130,5 +133,29 @@ public class Counsellee implements Serializable{
 
 	public void setOtherName(String otherName) {
 		this.otherName = otherName;
+	}
+
+	public void setDob(String dob) {
+		this.dob = dob;
+	}
+
+	public String getDob() {
+		return dob;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setDtTerm(String dtTerm) {
+		this.dtTerm = dtTerm;
+	}
+
+	public String getDtTerm() {
+		return dtTerm;
 	}
 }

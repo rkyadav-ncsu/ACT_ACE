@@ -65,6 +65,11 @@ public class JAceDate extends JPanel{
 		
 	}
 	
+	public void setEditable(boolean b){
+		txtYear.setEditable(b);
+		cbDay.setEditable(b);
+		cbMonth.setEditable(b);
+	}
 	/**
 	 * Returns the date in the format YYYYMMDD
 	 * @return
@@ -74,14 +79,26 @@ public class JAceDate extends JPanel{
 		String sDate = null;
 		
 		try{
-//			TODO prepen0 to day and month if required
-			sDate = new Integer(getYear()).toString();
-		
-			sDate += cbMonth.getSelectedItem().toString();
-			sDate += cbDay.getSelectedItem().toString();
+			sDate = String.valueOf(getYear());
+			
+			int month = cbMonth.getSelectedIndex();
+			if (month < 10){
+				sDate += "0" +String.valueOf(month);
+			}else{
+				sDate += String.valueOf(month);
+			}
+			
+			int day = cbDay.getSelectedIndex();
+			if (day < 10){
+				sDate += "0" +String.valueOf(day);
+			}else{
+				sDate += String.valueOf(day);
+			}
+			
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			sDate = null;
 		}
 		return sDate;
 		
@@ -95,6 +112,7 @@ public class JAceDate extends JPanel{
 	 */
 			
 	public void setDate(String sDate){
+		int m_int, d_int;
 		if (sDate == null || sDate.trim().equals("") || sDate.trim().length() != 8){
 			txtYear.setText("");
 			cbDay.setSelectedIndex(0);
@@ -105,8 +123,13 @@ public class JAceDate extends JPanel{
 		try{
 			
 			txtYear.setText(sDate.substring(0,4));
-			cbMonth.setSelectedItem(new Integer(sDate.substring(4,6)));
-			cbDay.setSelectedItem(new Integer(sDate.substring(6,8)));
+//			cbMonth.setSelectedItem(new Integer(sDate.substring(4,6)));								// ND commented 15th Apr 16
+			m_int = Integer.valueOf(sDate.substring(4,6));											// ND added 15 Apr 16
+			cbMonth.setSelectedItem(String.valueOf(m_int));											// ND added 15 Apr 16
+			System.out.println("cbMonth: " + sDate.substring(4,6) + "    " + sDate + " two digits " + String.valueOf(m_int));
+//			cbDay.setSelectedItem(new Integer(sDate.substring(6,8)));								// ND commented 15 Apr 16
+			d_int = Integer.valueOf(sDate.substring(6,8));
+			cbDay.setSelectedItem(Integer.toString(d_int));
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -118,7 +141,7 @@ public class JAceDate extends JPanel{
 		}
 	}
 	
-	public int getYear(){
+	private int getYear(){
 		return Integer.parseInt(txtYear.getText());
 	}
 

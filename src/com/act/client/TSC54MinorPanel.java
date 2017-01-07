@@ -20,6 +20,7 @@ import javax.swing.border.TitledBorder;
 
 import com.act.client.components.JAceDate;
 import com.act.common.Counsellee;
+import com.act.common.MHSymptChkListObj;
 import com.act.common.SwingUtils;
 import com.act.common.TSC40Obj;
 import com.act.common.TSC54Obj;
@@ -33,9 +34,10 @@ public class TSC54MinorPanel extends MHPanel implements ActionListener{
 	JPanel panelTop, panelCenter, panelCnsleeDetails, panelSymtoms, panelScore;
 	JLabel labelTitle;
 	JLabel cnsleName,
-	cnslrName, caseNumber, testDate;
+	cnslrName, caseNumber, testDate,testDesc;
 	JLabel valCnsleName, valCnslrName, valCaseNumber;
 	JAceDate valTestDate;
+	JTextField txtTestDesc;
 
 	JLabel lblBadDreams, lblFeelAfraidOfBad, lblScaryIdeas, lblDirtyWords,
 			lblPretend, lblArgue, lblFeelLonely, lblTouchPrivParts, lblFeelSad,
@@ -67,6 +69,9 @@ public class TSC54MinorPanel extends MHPanel implements ActionListener{
 	JTextField txtTotalScore, txtAnx, txtDep, txtAng, txtPts, txtDis, txtDisO, txtDisF, 
 				txtSc, txtScP, txtScD;
 	JButton btnGetScores, btnSave, btnClose;
+
+	private boolean bEditMode = false;
+	TSC54Obj tsc54Obj = null;
 	
 	public TSC54MinorPanel(Counsellee cnslee, CounselleeMain parent){
 		this.cnslee = cnslee;
@@ -74,6 +79,21 @@ public class TSC54MinorPanel extends MHPanel implements ActionListener{
 		
 		try{
 			initUI();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public TSC54MinorPanel(Counsellee cnslee, CounselleeMain parent, MHSymptChkListObj tsc54Obj){
+		this.cnslee = cnslee;
+		this.parent = parent;
+	    this.tsc54Obj = (TSC54Obj)tsc54Obj;
+	    bEditMode = true;
+	    
+		try{
+			initUI();
+			setValues();
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -142,12 +162,25 @@ public class TSC54MinorPanel extends MHPanel implements ActionListener{
 				0, 25, 0, 5));
 		
 		valTestDate = new JAceDate(); 
+		valTestDate.setEditable(false);
 		panelCnsleeDetails.add(valTestDate,SwingUtils.getConstraints(0, 5, GridBagConstraints.REMAINDER,
 				1,1, 
 				GridBagConstraints.NORTHWEST, 
 				GridBagConstraints.HORIZONTAL, 
 				0, 5, 0, 5));
 		
+		testDesc = new JLabel("Test Description: ");
+		panelCnsleeDetails.add(testDesc ,SwingUtils.getConstraints(0, 6, 1, 0,0, 
+				GridBagConstraints.NORTHWEST, 
+				GridBagConstraints.NONE, 
+				10, 25, 5, 5));
+		
+		txtTestDesc = new JTextField();
+		panelCnsleeDetails.add(txtTestDesc,SwingUtils.getConstraints(0, 7, 1, 1,1, 
+				GridBagConstraints.NORTHWEST,
+				GridBagConstraints.HORIZONTAL, 
+				10, 0, 5, 25));
+
 		//////Symptoms Panel ////////////////
 		panelSymtoms = new JPanel();
 		JScrollPane scrollPane = new JScrollPane(panelSymtoms);
@@ -1133,12 +1166,64 @@ public class TSC54MinorPanel extends MHPanel implements ActionListener{
 		
 	}
 	
-	private void save(){
-		TSC54Obj tsc54Obj = new TSC54Obj();
-		tsc54Obj.setChkListDate(valTestDate.getDate());
-		tsc54Obj.setCaseId(cnslee.getCaseNumber());
-		tsc54Obj.setChkListTotalScore(""); //TODO is it needed here?
+	private String getTotalScore(){
+		String totalScore = "";
 		
+		int scores =  getScoreDep()+
+				getScoreAng()+ 
+				getScorePts()+
+				getScoreDis()+
+				getScoreDisO()+
+				getScoreDisF()+
+				getScoreSc()+
+				getScoreScP()+
+				getScoreScD();
+		
+		totalScore = String.valueOf(scores);
+		return totalScore;
+	}
+
+	private boolean validateEntries(){
+		
+//		if (txtIndivLName.getText().trim().isEmpty()){
+//			JOptionPane.showMessageDialog(this, "Please enter a name for the beneficiary.");
+//			return;
+//		}
+//		if (cbPartnerOrg.getSelectedIndex() < 0){
+//			JOptionPane.showMessageDialog(this, "Please enter a partner organization for beneficiary.");
+//			return;
+//		}
+//		if (cbLocation.getSelectedIndex() < 0){
+//			JOptionPane.showMessageDialog(this, "Please enter a location for beneficiary.");
+//			return;
+//		}
+//		if (txtAge.getText().trim().isEmpty()){
+//			JOptionPane.showMessageDialog(this, "Please enter age for beneficiary.");
+//			return;
+//		}
+
+		return true;
+	}
+	
+	private void save(){
+		TSC54Obj tsc54Obj;
+		
+		if (bEditMode){
+			tsc54Obj = this.tsc54Obj;
+		}else{
+			tsc54Obj = new TSC54Obj();
+		}
+		
+		if (!validateEntries()){
+			return;
+		}
+		tsc54Obj.setChkListDate(valTestDate.getDate());
+		System.out.println("case Id " + cnslee.getCaseNumber());
+		
+		tsc54Obj.setCaseId(cnslee.getCaseNumber());
+		tsc54Obj.setChkListTotalScore(getTotalScore());
+		tsc54Obj.setChkListDesc(txtTestDesc.getText());
+
 		tsc54Obj.setBadDreams(cbBadDreams.getScore());
 		tsc54Obj.setFeelAfraidOfBad(cbFeelAfraidOfBad.getScore());
 		tsc54Obj.setScaryIdeas(cbScaryIdeas.getScore());
@@ -1196,122 +1281,107 @@ public class TSC54MinorPanel extends MHPanel implements ActionListener{
 
 		
 		//save it to the server
-		if (ACEConnector.getInstance().saveTSC54CheckLst(tsc54Obj)){
-			parent.addSymptChkLists(tsc54Obj);
+		if (bEditMode){
+			if (ACEConnector.getInstance().updateTSC54CheckLst(tsc54Obj)){
+				parent.updateSymptChkLists(tsc54Obj);
+			}else{
+				JOptionPane.showMessageDialog(this, "Error updating TSC 54 details to server","Error", JOptionPane.ERROR_MESSAGE);
+			}
+			
 		}else{
-			JOptionPane.showMessageDialog(this, "Error saving TSC 54 details to server","Error", JOptionPane.ERROR_MESSAGE);
+			if (ACEConnector.getInstance().saveTSC54CheckLst(tsc54Obj)){
+				parent.addSymptChkLists(tsc54Obj);
+			}else{
+				JOptionPane.showMessageDialog(this, "Error saving TSC 54 details to server","Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
-
-		parent.addSymptChkLists(tsc54Obj);
-
 	}
 	
-//	private void getTotalScore(){
-//		return txtAnx.getText();
-//		txtDep.setText(String.valueOf(scoreDep));
-//		txtAng.setText(String.valueOf(scoreAng));
-//		txtPts.setText(String.valueOf(scorePts));
-//		txtDis.setText(String.valueOf(scoreDis));
-//		txtDisO.setText(String.valueOf(scoreDisO));
-//		txtDisF.setText(String.valueOf(scoreDisF));
-//		txtSc.setText(String.valueOf(scoreSc));
-//		txtScP.setText(String.valueOf(scoreScP));
-//		txtScD.setText(String.valueOf(scoreScD));
-//				
-//				
-//	}
+	private void setValues(){
+		
+		try{
+			
+			valTestDate.setDate(tsc54Obj.getChkListDate());
+			
+			cnsleName.setText(tsc54Obj.getCaseId());
+//			tsc54Obj.getChkListTotalScore(setTotalScore());
+			txtTestDesc.setText(tsc54Obj.getChkListDesc());
+
+			cbBadDreams.setSelectedIndex(tsc54Obj.getBadDreams());
+			cbFeelAfraidOfBad.setSelectedIndex(tsc54Obj.getFeelAfraidOfBad());
+			cbScaryIdeas.setSelectedIndex(tsc54Obj.getScaryIdeas());
+			cbDirtyWords.setSelectedIndex(tsc54Obj.getDirtyWords());
+			cbPretend.setSelectedIndex(tsc54Obj.getPretend());
+			cbArgue.setSelectedIndex(tsc54Obj.getArgue());
+			cbFeelLonely.setSelectedIndex(tsc54Obj.getFeelLonely());
+			cbTouchPrivParts.setSelectedIndex(tsc54Obj.getTouchPrivParts());
+			cbFeelSad.setSelectedIndex(tsc54Obj.getFeelSad());
+			cbRemPastThings.setSelectedIndex(tsc54Obj.getRemPastThings());
+			cbGoingAway.setSelectedIndex(tsc54Obj.getGoingAway());
+			cbRemScaryThings.setSelectedIndex(tsc54Obj.getRemScaryThings());
+			cbYell.setSelectedIndex(tsc54Obj.getYell());
+			cbCrying.setSelectedIndex(tsc54Obj.getCrying());
+			cbSuddenFear.setSelectedIndex(tsc54Obj.getSuddenFear());
+			cbGettingMad.setSelectedIndex(tsc54Obj.getGettingMad());
+			cbThinkAbtSx.setSelectedIndex(tsc54Obj.getThinkAbtSx());
+			cbFeelDizzy.setSelectedIndex(tsc54Obj.getFeelDizzy());
+			cbYellOthers.setSelectedIndex(tsc54Obj.getYellOthers());
+			cbHurtSelf.setSelectedIndex(tsc54Obj.getHurtSelf());
+			cbHurtOthers.setSelectedIndex(tsc54Obj.getHurtOthers());
+			cbTouchOtherPrivParts.setSelectedIndex(tsc54Obj.getTouchOtherPrivParts());
+			cbThinkAbtSx.setSelectedIndex(tsc54Obj.getThinkSx());
+			cbFearMen.setSelectedIndex(tsc54Obj.getFearMen());
+			cbFearWomen.setSelectedIndex(tsc54Obj.getFearWomen());
+			cbWash.setSelectedIndex(tsc54Obj.getWash());
+			cbFeelStupid.setSelectedIndex(tsc54Obj.getFeelStupid());
+			cbFeelGuilt.setSelectedIndex(tsc54Obj.getFeelGuilt());
+			cbFeelUnreal.setSelectedIndex(tsc54Obj.getFeelUnreal());
+			cbForgetThings.setSelectedIndex(tsc54Obj.getForgetThings());
+			cbFeelNotInBody.setSelectedIndex(tsc54Obj.getFeelNotInBody());
+			cbFeelNervous.setSelectedIndex(tsc54Obj.getFeelNervous());
+			cbFeelAfraid.setSelectedIndex(tsc54Obj.getFeelAfraid());
+			cbNotTrustPeople.setSelectedIndex(tsc54Obj.getNotTrustPeople());
+			cbThinkBadPast.setSelectedIndex(tsc54Obj.getThinkBadPast());
+			cbFights.setSelectedIndex(tsc54Obj.getFights());
+			cbFeelMean.setSelectedIndex(tsc54Obj.getFeelMean());
+			cbPretendSomewhereElse.setSelectedIndex(tsc54Obj.getPretendSomewhereElse());
+			cbFearDark.setSelectedIndex(tsc54Obj.getFearDark());
+			cbUpsetAbtSx.setSelectedIndex(tsc54Obj.getUpsetAbtSx());
+			cbWorry.setSelectedIndex(tsc54Obj.getWorry());
+			cbFeelNooneLikesMe.setSelectedIndex(tsc54Obj.getFeelNooneLikesMe());
+			cbRemThings.setSelectedIndex(tsc54Obj.getRemThings());
+			cbFeelSx.setSelectedIndex(tsc54Obj.getFeelSx());
+			cbMindEmpty.setSelectedIndex(tsc54Obj.getMindEmpty()); 
+			cbFeelHate.setSelectedIndex(tsc54Obj.getFeelHate());
+			cbCantStopThinkAbtSx.setSelectedIndex(tsc54Obj.getCantStopThinkAbtSx());
+			cbTryNoFeelings.setSelectedIndex(tsc54Obj.getTryNoFeelings());
+			cbFeelMad.setSelectedIndex(tsc54Obj.getFeelMad());
+			cbFeelKill.setSelectedIndex(tsc54Obj.getFeelKill()); 
+			cbWishBadDinHappen.setSelectedIndex(tsc54Obj.getWishBadDinHappen());
+			cbWantToKillSelf.setSelectedIndex(tsc54Obj.getWantToKillSelf());
+			cbDayDream.setSelectedIndex(tsc54Obj.getDayDream());
+			cbUpsetTalkAbtSx.setSelectedIndex(tsc54Obj.getUpsetTalkAbtSx());
+			
+		}catch(Exception e){
+			
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Error setting values to be edited","Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
 	private void displayScores(){
 		
 		//Find All the scores
-		int scoreAnx = cbFeelAfraidOfBad.getScore() +
-						cbSuddenFear.getScore()+
-						cbFearMen.getScore() +
-						cbFearWomen.getScore() +
-						cbFeelNervous.getScore() +
-						cbFeelAfraid.getScore() +
-						cbFearDark.getScore() +
-						cbWorry.getScore() +
-						cbFeelKill.getScore();
-		
-		
-		int scoreDep = cbFeelLonely.getScore() +
-						cbFeelSad.getScore() +
-						cbCrying.getScore() +
-						cbHurtSelf.getScore() +
-						cbWash.getScore() +
-						cbFeelStupid.getScore() +
-						cbFeelGuilt.getScore() +
-						cbFeelNooneLikesMe.getScore() +
-						cbWantToKillSelf.getScore();
-		
-		int scoreAng = cbArgue.getScore() +
-						cbYell.getScore() +
-						cbGettingMad.getScore() +
-						cbYellOthers.getScore() +
-						cbHurtOthers.getScore() +
-						cbFights.getScore() +
-						cbFeelMean.getScore() +
-						cbFeelHate.getScore() +
-						cbFeelMad.getScore();
-		
-		int scorePts = cbBadDreams.getScore() +
-						cbScaryIdeas.getScore() +
-						cbRemThings.getScore() +
-						cbGoingAway.getScore() +
-						cbRemScaryThings.getScore() +
-						cbFearMen.getScore() +
-						cbFearWomen.getScore() +
-						cbThinkBadPast.getScore() +
-						cbRemPastThings.getScore() +
-						cbWishBadDinHappen.getScore();
-		
-		int scoreDis = cbPretend.getScore() +
-						cbGoingAway.getScore() +
-						cbFeelDizzy.getScore() +
-						cbFeelUnreal.getScore() +
-						cbForgetThings.getScore() +
-						cbFeelNotInBody.getScore() +
-						cbPretendSomewhereElse.getScore() +
-						cbMindEmpty.getScore() +
-						cbTryNoFeelings.getScore() +
-						cbDayDream.getScore();
-		
-		int scoreDisO = cbGoingAway.getScore() +
-						cbFeelDizzy.getScore() +
-						cbFeelUnreal.getScore() +
-						cbForgetThings.getScore() +
-						cbFeelNotInBody.getScore() +
-						cbMindEmpty.getScore() +
-						cbTryNoFeelings.getScore();
-		
-		int scoreDisF = cbPretend.getScore() +
-						cbPretendSomewhereElse.getScore() +
-						cbWantToKillSelf.getScore();
-		
-		int scoreSc =  cbDirtyWords.getScore() +
-						cbTouchPrivParts.getScore() +
-						cbThinkSx.getScore() +
-						cbTouchOtherPrivParts.getScore() +
-						cbThinkAbtSx.getScore() +
-						cbNotTrustPeople.getScore() +
-						cbUpsetAbtSx.getScore() +
-						cbFeelSx.getScore() +
-						cbCantStopThinkAbtSx.getScore() +
-						cbUpsetTalkAbtSx.getScore();
-		
-		int scoreScP = cbDirtyWords.getScore() +
-						cbTouchPrivParts.getScore() +
-						cbThinkAbtSx.getScore() +
-						cbTouchOtherPrivParts.getScore() +
-						cbThinkSx.getScore() +
-						cbFeelSx.getScore() +
-						cbCantStopThinkAbtSx.getScore();
-		
-		int scoreScD = cbThinkAbtSx.getScore() +
-						cbNotTrustPeople.getScore() +
-						cbUpsetAbtSx.getScore() +
-						cbUpsetTalkAbtSx.getScore();
-						
+		int scoreAnx = getScoreAnx();
+		int scoreDep = getScoreDep();
+		int scoreAng = getScoreAng();
+		int scorePts = getScorePts();
+		int scoreDis = getScoreDis();
+		int scoreDisO = getScoreDisO();
+		int scoreDisF = getScoreDisF();
+		int scoreSc = getScoreSc();
+		int scoreScP = getScoreScP();
+		int scoreScD = getScoreScD();
 						
 		//display Scores
 		txtAnx.setText(String.valueOf(scoreAnx));
@@ -1325,10 +1395,123 @@ public class TSC54MinorPanel extends MHPanel implements ActionListener{
 		txtScP.setText(String.valueOf(scoreScP));
 		txtScD.setText(String.valueOf(scoreScD));
 					
-						
-				
-				
-				
+	}
+
+	private int getScoreScD() {
+		int scoreScD = cbThinkAbtSx.getScore() +
+						cbNotTrustPeople.getScore() +
+						cbUpsetAbtSx.getScore() +
+						cbUpsetTalkAbtSx.getScore();
+		return scoreScD;
+	}
+
+	private int getScoreScP() {
+		int scoreScP = cbDirtyWords.getScore() +
+						cbTouchPrivParts.getScore() +
+						cbThinkAbtSx.getScore() +
+						cbTouchOtherPrivParts.getScore() +
+						cbThinkSx.getScore() +
+						cbFeelSx.getScore() +
+						cbCantStopThinkAbtSx.getScore();
+		return scoreScP;
+	}
+
+	private int getScoreSc() {
+		int scoreSc =  cbDirtyWords.getScore() +
+						cbTouchPrivParts.getScore() +
+						cbThinkSx.getScore() +
+						cbTouchOtherPrivParts.getScore() +
+						cbThinkAbtSx.getScore() +
+						cbNotTrustPeople.getScore() +
+						cbUpsetAbtSx.getScore() +
+						cbFeelSx.getScore() +
+						cbCantStopThinkAbtSx.getScore() +
+						cbUpsetTalkAbtSx.getScore();
+		return scoreSc;
+	}
+
+	private int getScoreDisF() {
+		return cbPretend.getScore() +
+						cbPretendSomewhereElse.getScore() +
+						cbWantToKillSelf.getScore();
+	}
+
+	private int getScoreDisO() {
+		int scoreDisO = cbGoingAway.getScore() +
+						cbFeelDizzy.getScore() +
+						cbFeelUnreal.getScore() +
+						cbForgetThings.getScore() +
+						cbFeelNotInBody.getScore() +
+						cbMindEmpty.getScore() +
+						cbTryNoFeelings.getScore();
+		return scoreDisO;
+	}
+
+	private int getScoreDis() {
+		int scoreDis = cbPretend.getScore() +
+						cbGoingAway.getScore() +
+						cbFeelDizzy.getScore() +
+						cbFeelUnreal.getScore() +
+						cbForgetThings.getScore() +
+						cbFeelNotInBody.getScore() +
+						cbPretendSomewhereElse.getScore() +
+						cbMindEmpty.getScore() +
+						cbTryNoFeelings.getScore() +
+						cbDayDream.getScore();
+		return scoreDis;
+	}
+
+	private int getScorePts() {
+		int scorePts = cbBadDreams.getScore() +
+						cbScaryIdeas.getScore() +
+						cbRemThings.getScore() +
+						cbGoingAway.getScore() +
+						cbRemScaryThings.getScore() +
+						cbFearMen.getScore() +
+						cbFearWomen.getScore() +
+						cbThinkBadPast.getScore() +
+						cbRemPastThings.getScore() +
+						cbWishBadDinHappen.getScore();
+		return scorePts;
+	}
+
+	private int getScoreAng() {
+		int scoreAng = cbArgue.getScore() +
+						cbYell.getScore() +
+						cbGettingMad.getScore() +
+						cbYellOthers.getScore() +
+						cbHurtOthers.getScore() +
+						cbFights.getScore() +
+						cbFeelMean.getScore() +
+						cbFeelHate.getScore() +
+						cbFeelMad.getScore();
+		return scoreAng;
+	}
+
+	private int getScoreDep() {
+		int scoreDep = cbFeelLonely.getScore() +
+						cbFeelSad.getScore() +
+						cbCrying.getScore() +
+						cbHurtSelf.getScore() +
+						cbWash.getScore() +
+						cbFeelStupid.getScore() +
+						cbFeelGuilt.getScore() +
+						cbFeelNooneLikesMe.getScore() +
+						cbWantToKillSelf.getScore();
+		return scoreDep;
+	}
+
+	private int getScoreAnx() {
+		int scoreAnx = cbFeelAfraidOfBad.getScore() +
+						cbSuddenFear.getScore()+
+						cbFearMen.getScore() +
+						cbFearWomen.getScore() +
+						cbFeelNervous.getScore() +
+						cbFeelAfraid.getScore() +
+						cbFearDark.getScore() +
+						cbWorry.getScore() +
+						cbFeelKill.getScore();
+		return scoreAnx;
 	}
 
 	@Override

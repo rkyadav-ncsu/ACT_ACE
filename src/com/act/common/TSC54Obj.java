@@ -2,10 +2,9 @@ package com.act.common;
 
 import java.io.Serializable;
 
-public class TSC54Obj extends MHSymptChkListObj implements Serializable{
+public class TSC54Obj extends MHSymptChkListObj {
 	
-	private static final long serialVersionUID = -6716054809734512529L;
-	
+	private static final long serialVersionUID = 7745073558488269669L;
 	private int nBadDreams, nFeelAfraidOfBad, nScaryIdeas, nDirtyWords,
 					nPretend, nArgue, nFeelLonely, nTouchPrivParts, nFeelSad,
 					nRemPastThings, nGoingAway, nRemScaryThings, nYell, nCrying,
@@ -17,7 +16,7 @@ public class TSC54Obj extends MHSymptChkListObj implements Serializable{
 					nWorry, nFeelNooneLikesMe, nRemThings, nFeelSx, nMindEmpty, 
 					nFeelHate, nCantStopThinkAbtSx, nTryNoFeelings, nFeelMad, nFeelKill, 
 					nWishBadDinHappen, nWantToKillSelf, nDayDream, nUpsetTalkAbtSx;
-	private String sCaseNumber,assessmentId;
+	private String sCaseNumber;//,assessmentId;
 	
 	public TSC54Obj(){
 		setChkListType(SYMPT_CKLIST_TYPE_TSC54);
@@ -27,8 +26,8 @@ public class TSC54Obj extends MHSymptChkListObj implements Serializable{
 		return sCaseNumber;
 	}
 
-	public void setCaseId(String nCaseNumber) {
-		this.sCaseNumber = sCaseNumber;
+	public void setCaseId(String caseNumber) {
+		this.sCaseNumber = caseNumber;
 	}
 	
 	public int getBadDreams() {
@@ -463,13 +462,13 @@ public class TSC54Obj extends MHSymptChkListObj implements Serializable{
 		this.nUpsetTalkAbtSx = nUpsetTalkAbtSx;
 	}
 
-	public String getAssessmentId() {
-		return assessmentId;
-	}
-
-	public void setAssessmentId(String assessmentId) {
-		this.assessmentId = assessmentId;
-	}
+//	public String getAssessmentId() {
+//		return assessmentId;
+//	}
+//
+//	public void setAssessmentId(String assessmentId) {
+//		this.assessmentId = assessmentId;
+//	}
 
 
 }

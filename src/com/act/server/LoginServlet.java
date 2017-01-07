@@ -1,7 +1,11 @@
 package com.act.server;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -10,6 +14,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.act.common.ACEDefines;
+import com.act.common.Counsellee;
+import com.act.server.db.CounselleeMSDB;
 import com.act.server.db.UserMSDB;
 
 public class LoginServlet extends HttpServlet{
@@ -22,7 +29,14 @@ public class LoginServlet extends HttpServlet{
     	System.out.println("hit the servlet!!!!");
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        
+
+        //gg test
+        try{
+        	System.out.println("&&&&&&&&&&& userId:: " + request.getSession().getAttribute(ACEDefines.USER_ID));
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
+		
         //Authentication
         String userId = request.getParameter("username");
         System.out.println("userId" + userId);
@@ -57,25 +71,28 @@ public class LoginServlet extends HttpServlet{
                 "</html>" ;
         
         //first check if page is opened first time
-        if (login == null){
+        if (login == null){ 
         	System.out.println("first time");
         	out.println(s);
         }
         else if (validateUser(userId, password)){
         	System.out.println("login success");
-        	request.getSession().setAttribute("USERID", userId);
+        	request.getSession().setAttribute(ACEDefines.USER_ID, userId);
         	
-			RequestDispatcher rs = request.getRequestDispatcher("Welcome.html");
-			request.setAttribute("LoginUser", userId);
-			request.setAttribute("Password", password);
+			RequestDispatcher rs = request.getRequestDispatcher("Welcome.jsp");
+			
+			request.getSession().setAttribute("LoginUser", userId);
+			request.getSession().setAttribute("Password", password);
+			
+//	          response.sendRedirect("Welcome.jsp"); //logged-in page      		
+	     
 			rs.include(request, response);
         }
         else{
+
         	System.out.println("login incorrect");
         	out.println("<font color = 'red' > User Name or Password is incorrect. </font>");
         	out.println(s);
-        	
-
         }
     }  
     
@@ -86,7 +103,7 @@ public class LoginServlet extends HttpServlet{
     }
     
     private boolean validateUser(String userName, String password){
-    	UserMSDB userDB = new UserMSDB();
+    	UserMSDB userDB = UserMSDB.getInstance();
     	return userDB.findUser(userName, password);
     	
 //    	if(userName != null && userName.equals("admin") && 

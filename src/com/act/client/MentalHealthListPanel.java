@@ -316,7 +316,7 @@ public class MentalHealthListPanel extends MHPanel implements  ActionListener{
 		
 		String sParentOrg = txtParentOrg.getText().trim(); 
 		if (sParentOrg.length() >0){
-			htOptions.put(ACEDefines.COUNSELLE_PARENT_ORG, sParentOrg);
+			htOptions.put(ACEDefines.COUNSELLE_ORGANIZATION, sParentOrg);
 		}
 		
 		String sOtherName = txtOtherName.getText().trim(); 

@@ -15,7 +15,8 @@ public class MHFamHistIndivModel extends AbstractTableModel{
 			"Profession",
 			"Age",
 			"Aware of Victim's situation",
-			"Comments"};
+			"Comments",
+			"Case Number"};										// ND edited 21st Apr 16
 			
 	Vector<CounseleeRelativeIndivObj> vData= new Vector<CounseleeRelativeIndivObj>(); 
 
@@ -62,6 +63,8 @@ public class MHFamHistIndivModel extends AbstractTableModel{
 					return indiv.isRelAwareOfVictimsSituation();
 				case 6:
 					return indiv.getRelComments();
+				case 7:
+					return indiv.getCaseNumber();								// ND added 21st Apr 16
 				default:
 					break ;
 				
@@ -95,7 +98,10 @@ public class MHFamHistIndivModel extends AbstractTableModel{
 	
 	// ND added 12th Mar 16
 	// To transfer the values in the vector (read from the database) to a table
-	public  void setValues(Vector<CounseleeRelativeIndivObj> vReln) {
+	public  void setRelTableValues(Vector<CounseleeRelativeIndivObj> vReln) {
+		if(vReln == null)
+			return;
+		
 		int rowz = vReln.size();
 		CounseleeRelativeIndivObj cnslReln = new CounseleeRelativeIndivObj();
 		
@@ -107,8 +113,38 @@ public class MHFamHistIndivModel extends AbstractTableModel{
 		} 
 		} else System.out.println("No data to transfer to table");
 		
+	}	
+	
+	// ND added 26th Apr 16
+	public CounseleeRelativeIndivObj getRowObject(int row){
+			if (row > -1){
+				if (vData != null && vData.size() > row){
+					return vData.get(row);
+				}
+			}
+			
+			return null;
+	}
+	
+	// ND added 28th Apr 16
+	public void delTableRows(Vector vRelDel, int[] sRows) {
+		Vector vFamRel = null;
 		
-		
+//		for(int i = 0; i < sRows.length; i++){
+//			vFamRel.add(vRelDel.elementAt(i));
+//		}
+		vData.removeAll(vRelDel);
+		fireTableStructureChanged();
 		
 	}
+	
+	// ND added 28th Apr 16
+	public void delTableRow( int sRow) {
+		Vector vFamRel = null;
+		
+		vData.removeElementAt(sRow);
+		fireTableStructureChanged();
+		
+	}
+		
 }

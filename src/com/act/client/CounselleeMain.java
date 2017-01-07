@@ -14,6 +14,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -25,8 +26,11 @@ import com.act.client.models.MHSessionsTableModel;
 import com.act.client.models.MHSymptChkListModel;
 import com.act.common.ACEDefines;
 import com.act.common.Counsellee;
+import com.act.common.CounsellingSessionObj;
 import com.act.common.MHSymptChkListObj;
 import com.act.common.SwingUtils;
+import com.act.common.TSC40Obj;
+import com.act.common.TSC54Obj;
 
 public class CounselleeMain extends MHPanel implements ActionListener{
 	
@@ -195,7 +199,10 @@ public class CounselleeMain extends MHPanel implements ActionListener{
 		
 		//Table
 		modelSessions = new MHSessionsTableModel();
-		modelSessions.setList(ACEConnector.getInstance().getSessionList(new Hashtable()));
+		Hashtable<String, String> htOptionsSessions = new Hashtable<String, String>();
+		htOptionsSessions.put(ACEDefines.COUNSELLE_CASE_ID, counsellee.getCaseNumber());
+		
+		modelSessions.setList(ACEConnector.getInstance().getCounsellingSession(htOptionsSessions));
 		tblSessions = new JTable(modelSessions);
 		JScrollPane scrollPaneTblSessions = new JScrollPane(tblSessions);
 		tblSessions.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -260,16 +267,78 @@ public class CounselleeMain extends MHPanel implements ActionListener{
 				panelObserver.addPanel(minorPanel);
 			}
 		}
+		else if (e.getSource() == btnEditSymptChkList){
+			int row = tblSymptCheckLists.getSelectedRow();
+			MHSymptChkListObj obj = modelSymptChkList.getRowObject(row);
+			System.out.println("chklist selected: " + obj.getChkListType());
+			if (obj.getChkListType().equals(MHSymptChkListObj.SYMPT_CKLIST_TYPE_TSC40)){
+				TSC40MajorPanel majorPanel = new TSC40MajorPanel(counsellee, this, (TSC40Obj)obj);
+				majorPanel.setMHPanelObserver(panelObserver);
+				panelObserver.addPanel(majorPanel);
+				
+			}else{
+				TSC54MinorPanel minorPanel = new TSC54MinorPanel(counsellee, this, obj);
+				minorPanel.setMHPanelObserver(panelObserver);
+				panelObserver.addPanel(minorPanel);
+			}
+		}
+		else if (e.getSource() == btnDelSymptChkList){
+			int row = tblSymptCheckLists.getSelectedRow();
+			MHSymptChkListObj obj = modelSymptChkList.getRowObject(row);
+			if (obj.getChkListType().equals(MHSymptChkListObj.SYMPT_CKLIST_TYPE_TSC40)){
+				if (ACEConnector.getInstance().deleteTSC40CheckLst((TSC40Obj)obj)){
+					modelSymptChkList.removeRow(obj);
+				}else{
+					JOptionPane.showMessageDialog(this, "Error deleting TSC 40 details from server","Error", JOptionPane.ERROR_MESSAGE);
+				}
+
+			}else{
+				if (ACEConnector.getInstance().deleteTSC54CheckLst((TSC54Obj)obj)){
+					modelSymptChkList.removeRow(obj);
+				}else{
+					JOptionPane.showMessageDialog(this, "Error deleting TSC 54 details from server","Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}
 		else if (e.getSource() == btnAddSession){
-			CounsellingSessionPanel sessionsPanel = new CounsellingSessionPanel(counsellee);
+			CounsellingSessionPanel sessionsPanel = new CounsellingSessionPanel(counsellee, this);
 			sessionsPanel.setMHPanelObserver(panelObserver);
 			panelObserver.addPanel(sessionsPanel);
+		}		
+		else if (e.getSource() == btnEditSession){
+			CounsellingSessionPanel sessionsPanel = new CounsellingSessionPanel(counsellee,this,
+													modelSessions.getRowObject(tblSessions.getSelectedRow()));
+			sessionsPanel.setMHPanelObserver(panelObserver);
+			panelObserver.addPanel(sessionsPanel);
+		}		
+		else if (e.getSource() == btnDelSession){
+			if (ACEConnector.getInstance().deleteCounsellingSession(
+							modelSessions.getRowObject(tblSessions.getSelectedRow()))){
+				modelSessions.removeRow(tblSessions.getSelectedRow());
+			}
 		}		
 	}
 	
 	public void addSymptChkLists(MHSymptChkListObj chklistObj){
+		System.out.println("add row chklist to model");
 		modelSymptChkList.addRow(chklistObj);
 	}
 	
+	public void updateSymptChkLists(MHSymptChkListObj chklistObj){
+		System.out.println("add row chklist to model");
+		modelSymptChkList.updateRow(chklistObj);
+	}
+
+	public void addCnslingSession(CounsellingSessionObj sessionObj){
+		System.out.println("add row chklist to model");
+		modelSessions.addRow(sessionObj);
+	}
+	
+	public void updateCnslingSession(CounsellingSessionObj sessionObj){
+		System.out.println("add row chklist to model");
+		modelSessions.updateRow(sessionObj);
+	}
+	
+
 }
 

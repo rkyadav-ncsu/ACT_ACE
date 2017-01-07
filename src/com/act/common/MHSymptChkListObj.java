@@ -1,6 +1,10 @@
 package com.act.common;
 
-public class MHSymptChkListObj { 
+import java.io.Serializable;
+
+public class MHSymptChkListObj implements Serializable{ 
+	
+	private static final long serialVersionUID = -1976549602973284550L;
 	
 	public static String SYMPT_CKLIST_TYPE_TSC40 = "TSC40 Major";
 	public static String SYMPT_CKLIST_TYPE_TSC54 = "TSC54 Minor";
@@ -9,7 +13,8 @@ public class MHSymptChkListObj {
 					chkListType,
 					chkListDate,
 					chkListTotalScore,
-					chkListCounsellor;
+					chkListCounsellor,
+					chkListDesc;
 
 	public String getChkListId() {
 		return chkListId;
@@ -49,6 +54,14 @@ public class MHSymptChkListObj {
 
 	public void setChkListCounsellor(String chkListCounsellor) {
 		this.chkListCounsellor = chkListCounsellor;
+	}
+
+	public String getChkListDesc() {
+		return chkListDesc;
+	}
+
+	public void setChkListDesc(String chkListDesc) {
+		this.chkListDesc = chkListDesc;
 	}
 
 }
