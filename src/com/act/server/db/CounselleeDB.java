@@ -9,6 +9,7 @@ import com.act.common.Counsellee;
 
 public abstract class CounselleeDB extends DB{
 	
-	public abstract Vector<Counsellee> getList(Hashtable<String, String> htOptions);
+	public abstract Vector<Counsellee> getCounsleeList(String CnslrId,
+													Hashtable<String, String> htOptions);
 
 }

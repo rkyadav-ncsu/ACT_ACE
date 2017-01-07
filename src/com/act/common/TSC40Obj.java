@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import com.act.client.JComboBoxSymptoms;
 
-public class TSC40Obj extends MHSymptChkListObj implements Serializable{
+public class TSC40Obj extends MHSymptChkListObj {
 	
 	
 	private static final long serialVersionUID = 7963487726828204528L;
@@ -17,7 +17,7 @@ public class TSC40Obj extends MHSymptChkListObj implements Serializable{
 					nPassOut, nUnrealFeel, nFreqWash, nInferiority, nTension, nSxConfusion,
 					nHurtOthers, nGuilt, nFeelNotInBody, nBreatheTrouble, nSxFeelingUntimely;
 	
-	private String caseId, assessmentId ;
+	private String caseId;//, assessmentId ;
 
 	public TSC40Obj(){
 		setChkListType(SYMPT_CKLIST_TYPE_TSC40);
@@ -351,13 +351,13 @@ public class TSC40Obj extends MHSymptChkListObj implements Serializable{
 		this.caseId = caseId;
 	}
 
-	public String getAssessmentId() {
-		return assessmentId;
-	}
-
-	public void setAssessmentId(String assessmentId) {
-		this.assessmentId = assessmentId;
-	}
+//	public String getAssessmentId() {
+//		return assessmentId;
+//	}
+//
+//	public void setAssessmentId(String assessmentId) {
+//		this.assessmentId = assessmentId;
+//	}
 
 
 }

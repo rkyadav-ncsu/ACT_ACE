@@ -25,8 +25,10 @@ import javax.swing.JDialog;
 import javax.swing.JInternalFrame.JDesktopIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -35,7 +37,6 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-import sun.net.www.content.text.plain;
 
 import com.act.client.components.CommLangPanel;
 import com.act.client.components.JAceDate;
@@ -101,6 +102,13 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 	JButton btnAdd, btnEdit, btnDel;
 	JTable tblRelatives;
 	MHFamHistIndivModel modelFamHist;
+	
+	// ND added 22nd Apr 16
+	JPopupMenu popRelTbl;									
+	JMenuItem menuRelEdit;
+	JMenuItem menuRelRemove;
+	MHPanelObserver panelObserver;
+
 	
 	//Family Environment tab
 	Vector vGrades = new Vector();
@@ -216,18 +224,19 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 	public IntakeFormDlg(MentalHealthListPanel parent, URL codebase){
 		this.parent = parent;
 		this.codebase = codebase;
+		System.out.println("B4 running init isEditMode = " + isEditMode);
 		init();
 	}
 
 	public IntakeFormDlg(MentalHealthListPanel parent, URL codebase,
 			Counsellee cnsl, CounseleeHistoryObj cnslHist){
+		
 		isEditMode = true;
-
 		this.parent = parent;
 		this.codebase = codebase;
 		this.cnslee = cnsl;
 		this.cnsleeHist = cnslHist;
-		
+		System.out.println("B4 running setEditValues isEditMode = " + isEditMode);
 		init();
 		setEditValues();
 	}
@@ -238,6 +247,8 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 
 			//Set the parent panel layout
 			setLayout(new BorderLayout());
+			
+			System.out.println("Edit Mode is " + isEditMode);
 			
 			//create and add Top Panel
 			panelTop = new JPanel();
@@ -354,13 +365,21 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			
 			//Age
 			lblAge	= new JLabel("Age: ");
+//			panelTopIndiv.add(lblAge,SwingUtils.getConstraints(2, 2, 1, 0,0, 
+//			GridBagConstraints.WEST, 
+//			GridBagConstraints.NONE, 
+//			5, 15, 5, 5));
 			panelTopIndiv.add(lblAge,SwingUtils.getConstraints(2, 0, 1, 0,0, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.NONE, 
 					5, 5, 5, 5));
 			
 			txtAge = new JTextField();
-			txtAge.setPreferredSize(new Dimension(30,22));
+			txtAge.setPreferredSize(new Dimension(20,22));
+//			panelTopIndiv.add(txtAge,SwingUtils.getConstraints(2, 3, 1, 0,0, 
+//			GridBagConstraints.WEST, 
+//			GridBagConstraints.NONE	,			// HORIZONTAL, 
+//			5, 5, 5, 10));
 			panelTopIndiv.add(txtAge,SwingUtils.getConstraints(2, 1, 1, 0,0, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.NONE, 
@@ -368,6 +387,10 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			
 			//DOB
 			lblDOB	= new JLabel("Date of Birth: ");
+//			panelTopIndiv.add(lblDOB,SwingUtils.getConstraints(2, 4, 1, 0,0, 
+//					GridBagConstraints.WEST, 
+//					GridBagConstraints.NONE, 
+//					5, 15, 5, 0));
 			panelTopIndiv.add(lblDOB,SwingUtils.getConstraints(2, 2, 1, 0,0, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.NONE, 
@@ -375,6 +398,10 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			
 			dateDOB = new JAceDate();
 			dateDOB.setDate(""); //set no date initially
+//			panelTopIndiv.add(dateDOB,SwingUtils.getConstraints(2, 5, 1, 0,0, 
+//					GridBagConstraints.WEST, 
+//					GridBagConstraints.HORIZONTAL, 
+//					5, 5, 5, 10));
 			panelTopIndiv.add(dateDOB,SwingUtils.getConstraints(2, 3, 1, 0,0, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.HORIZONTAL, 
@@ -395,6 +422,10 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			
 			
 			lblGender = new JLabel("Gender: ");
+//			panelTopIndiv.add(lblGender,SwingUtils.getConstraints(2, 0, 1, 0,0, 
+//					GridBagConstraints.WEST, 
+//					GridBagConstraints.NONE, 
+//					5, 5, 5, 5));
 			panelTopIndiv.add(lblGender,SwingUtils.getConstraints(3, 0, 1, 0,0, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.NONE, 
@@ -404,19 +435,31 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			cbGender.addItem("Female");
 			cbGender.addItem("Male");
 			cbGender.addItem("Other");
+//			panelTopIndiv.add(cbGender,SwingUtils.getConstraints(2, 1, 1, 0,0, 
+//					GridBagConstraints.WEST, 
+//					GridBagConstraints.NONE, 
+//					5, 5, 5, 10));
 			panelTopIndiv.add(cbGender,SwingUtils.getConstraints(3, 1, 1, 0,0, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.NONE, 
 					5, 5, 5, 10));
-			
+
 			//Assessment date
 			lblAssessmentDt = new JLabel("Date of Assessment: ");
+//			panelTopIndiv.add(lblAssessmentDt,SwingUtils.getConstraints(3, 0, 1, 0,0, 
+//					GridBagConstraints.WEST, 
+//					GridBagConstraints.NONE, 
+//					5, 5, 5, 5));
 			panelTopIndiv.add(lblAssessmentDt,SwingUtils.getConstraints(3, 2, 1, 0,0, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.NONE, 
 					5, 15, 5, 0));
 			
 			dateAssessment = new JAceDate();
+//			panelTopIndiv.add(dateAssessment,SwingUtils.getConstraints(3, 1, 1, 0,0, 
+//					GridBagConstraints.WEST, 
+//					GridBagConstraints.NONE, 
+//					5, 5, 5, 10));
 			panelTopIndiv.add(dateAssessment,SwingUtils.getConstraints(3, 3, 0, 0,0, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.NONE, 
@@ -424,12 +467,20 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			
 			//termination date
 			lblTerminationDt = new JLabel("Date of Termination: ");
+//			panelTopIndiv.add(lblTerminationDt,SwingUtils.getConstraints(3, 2, 1, 0,0, 
+//			GridBagConstraints.WEST, 
+//			GridBagConstraints.NONE, 
+//			5, 15, 5, 0));
 			panelTopIndiv.add(lblTerminationDt,SwingUtils.getConstraints(3, 4, 1, 0,0, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.NONE, 
 					5, 15, 5, 0));
 			
 			dateTermination = new JAceDate();
+//			panelTopIndiv.add(dateTermination,SwingUtils.getConstraints(3, 3, 0, 0,0, 
+//			GridBagConstraints.WEST, 
+//			GridBagConstraints.NONE, 
+//			5, 5, 5, 10));
 			panelTopIndiv.add(dateTermination,SwingUtils.getConstraints(3, 5, GridBagConstraints.REMAINDER, 1,1, 
 					GridBagConstraints.WEST, 
 					GridBagConstraints.NONE, 
@@ -450,7 +501,7 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			panelMainFamHist.setLayout(new BorderLayout());
 			tabPane.add(panelMainFamHist, "Family History");
 			
-			if (isEditMode){
+			if (isEditMode == true){									// ND added 5th Apr 16
 				panelApplyFamHist = new JPanel();
 				panelApplyFamHist.setLayout(new BorderLayout());
 	     			panelMainFamHist.add(panelApplyFamHist, BorderLayout.EAST);
@@ -502,9 +553,9 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 					5, 5, 5, 5));
 			
 			cmbRelShip = new JComboBox();
-			Vector vRelationship = ACEConnector.getInstance(codebase).getRelationshipList();
+//			Vector vRelationship = ACEConnector.getInstance(codebase).getRelationshipList();					// ND commented 26th Apr 16
 			cmbRelShip.addItem(NA);
-			populate(cmbRelShip, vRelationship);
+			populate(cmbRelShip, ACEConnector.getInstance(codebase).getRelationshipList());						// ND edited 26th Apr 16
 			
 			panelFamHistIndiv.add(cmbRelShip,SwingUtils.getConstraints(1, 1, 1, 0,0, 
 					GridBagConstraints.WEST, 
@@ -581,20 +632,35 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			JScrollPane scrollFamHist = new JScrollPane(tblRelatives);
 			panelFamHist.add(scrollFamHist, BorderLayout.CENTER);
 			
-			//Family Environment Panel
+	// start ND added 22nd Apr 16				
+			popRelTbl = new JPopupMenu();
+			menuRelEdit = new JMenuItem("Edit");
+			menuRelEdit.addActionListener(this);
+			
+			menuRelRemove = new JMenuItem("Delete");
+			menuRelRemove.addActionListener(this);
+
+			popRelTbl.add(menuRelEdit);
+			popRelTbl.add(menuRelRemove);
+			tblRelatives.setComponentPopupMenu(popRelTbl);
+
+	//end ND added 22nd Apr 16
+			
+	//Family Environment Panel
 			panelMainFamEnv = new JPanel();
 			panelMainFamEnv.setLayout(new BorderLayout());
 			tabPane.add(panelMainFamEnv, "Family Environment");
 	
-			panelApplyFamEnv = new JPanel();
-			panelApplyFamEnv.setLayout(new BorderLayout());
-     		panelMainFamEnv.add(panelApplyFamEnv, BorderLayout.EAST);
-			btnApplyFamEnv = new JButton("Apply");
-			btnApplyFamEnv.addActionListener(this);				// ND edited 5th Feb 16
-
-			btnApplyFamEnv.setBackground(new Color(249,184,172));
-			panelApplyFamEnv.add(btnApplyFamEnv, BorderLayout.SOUTH);
-
+			if (isEditMode == true){									// ND added 5th Apr 16
+				panelApplyFamEnv = new JPanel();
+				panelApplyFamEnv.setLayout(new BorderLayout());
+	     		panelMainFamEnv.add(panelApplyFamEnv, BorderLayout.EAST);
+				btnApplyFamEnv = new JButton("Apply");
+				btnApplyFamEnv.addActionListener(this);				// ND edited 5th Feb 16
+	
+				btnApplyFamEnv.setBackground(new Color(249,184,172));
+				panelApplyFamEnv.add(btnApplyFamEnv, BorderLayout.SOUTH);
+			}
 			panelFamEnv = new JPanel();
 			panelMainFamEnv.add(panelFamEnv, BorderLayout.CENTER);
 			panelFamEnv.setLayout(new GridBagLayout());
@@ -746,15 +812,16 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			panelMainEdu.setLayout(new BorderLayout());
 			tabPane.add(panelMainEdu, "Educational History");
 			
-			panelApplyEdu = new JPanel();
-			panelApplyEdu.setLayout(new BorderLayout());
-     		panelMainEdu.add(panelApplyEdu, BorderLayout.EAST);
-			btnApplyEdu = new JButton("Apply");
-			btnApplyEdu.addActionListener(this);			// ND added 5th Feb 16
-
-			btnApplyEdu.setBackground(new Color(249,184,172));
-			panelApplyEdu.add(btnApplyEdu, BorderLayout.SOUTH);
-
+			if (isEditMode == true){								// ND added 5th Apr 16
+				panelApplyEdu = new JPanel();
+				panelApplyEdu.setLayout(new BorderLayout());
+	     		panelMainEdu.add(panelApplyEdu, BorderLayout.EAST);
+				btnApplyEdu = new JButton("Apply");
+				btnApplyEdu.addActionListener(this);			// ND added 5th Feb 16
+	
+				btnApplyEdu.setBackground(new Color(249,184,172));
+				panelApplyEdu.add(btnApplyEdu, BorderLayout.SOUTH);
+			}
 			panelEdu = new JPanel();
 			panelMainEdu.add(panelEdu, BorderLayout.CENTER);
 			panelEdu.setLayout(new GridBagLayout());
@@ -863,15 +930,16 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			panelMainVoc.setLayout(new BorderLayout());
 			tabPane.add(panelMainVoc, "Vocational and Financial Info");
 			
-			panelApplyVoc = new JPanel();
-			panelApplyVoc.setLayout(new BorderLayout());
-     		panelMainVoc.add(panelApplyVoc, BorderLayout.EAST);
-			btnApplyVoc = new JButton("Apply");
-			btnApplyVoc.addActionListener(this);			// ND added 5th Feb 16
-
-			btnApplyVoc.setBackground(new Color(249,184,172));
-			panelApplyVoc.add(btnApplyVoc, BorderLayout.SOUTH);
-
+			if (isEditMode == true){								// ND added 5th Apr 16
+				panelApplyVoc = new JPanel();
+				panelApplyVoc.setLayout(new BorderLayout());
+	     		panelMainVoc.add(panelApplyVoc, BorderLayout.EAST);
+				btnApplyVoc = new JButton("Apply");
+				btnApplyVoc.addActionListener(this);			// ND added 5th Feb 16
+	
+				btnApplyVoc.setBackground(new Color(249,184,172));
+				panelApplyVoc.add(btnApplyVoc, BorderLayout.SOUTH);
+			}
 			panelVoc = new JPanel();
 			panelMainVoc.add(panelVoc, BorderLayout.CENTER);
 			panelVoc.setLayout(new GridBagLayout());
@@ -964,15 +1032,16 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			panelMainSoc.setLayout(new BorderLayout());
 			tabPane.add(panelMainSoc,"Social History");
 			
-			panelApplySoc = new JPanel();
-			panelApplySoc.setLayout(new BorderLayout());
-     		panelMainSoc.add(panelApplySoc, BorderLayout.EAST);
-			btnApplySoc = new JButton("Apply");
-			btnApplySoc.addActionListener(this);			// ND added 5th Feb 16
-
-			btnApplySoc.setBackground(new Color(249,184,172));
-			panelApplySoc.add(btnApplySoc, BorderLayout.SOUTH);
-
+			if (isEditMode == true){								// ND added 5th Apr 16
+				panelApplySoc = new JPanel();
+				panelApplySoc.setLayout(new BorderLayout());
+	     		panelMainSoc.add(panelApplySoc, BorderLayout.EAST);
+				btnApplySoc = new JButton("Apply");
+				btnApplySoc.addActionListener(this);			// ND added 5th Feb 16
+	
+				btnApplySoc.setBackground(new Color(249,184,172));
+				panelApplySoc.add(btnApplySoc, BorderLayout.SOUTH);
+			}
 			panelSoc = new JPanel();
 			panelMainSoc.add(panelSoc, BorderLayout.CENTER);
 			panelSoc.setLayout(new GridBagLayout());
@@ -1086,15 +1155,16 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			panelMainLegal.setLayout(new BorderLayout());
 			tabPane.add(panelMainLegal,"Legal History");
 			
-			panelApplyLegal = new JPanel();
-			panelApplyLegal.setLayout(new BorderLayout());
-     		panelMainLegal.add(panelApplyLegal, BorderLayout.EAST);
-			btnApplyLegal = new JButton("Apply");
-			btnApplyLegal.addActionListener(this);			// ND added 5th Feb 16
-
-			btnApplyLegal.setBackground(new Color(249,184,172));
-			panelApplyLegal.add(btnApplyLegal, BorderLayout.SOUTH);
-
+			if (isEditMode == true){								// ND added 5th Apr 16
+				panelApplyLegal = new JPanel();
+				panelApplyLegal.setLayout(new BorderLayout());
+	     		panelMainLegal.add(panelApplyLegal, BorderLayout.EAST);
+				btnApplyLegal = new JButton("Apply");
+				btnApplyLegal.addActionListener(this);			// ND added 5th Feb 16
+	
+				btnApplyLegal.setBackground(new Color(249,184,172));
+				panelApplyLegal.add(btnApplyLegal, BorderLayout.SOUTH);
+			}
 			panelLegal = new JPanel();
 			panelMainLegal.add(panelLegal, BorderLayout.CENTER);
 			panelLegal.setLayout(new GridBagLayout());
@@ -1132,15 +1202,16 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 		panelMainPhys.setLayout(new BorderLayout());
 		tabPane.add(panelMainPhys, "Physical History");
 		
-		panelApplyPhys = new JPanel();
-		panelApplyPhys.setLayout(new BorderLayout());
- 		panelMainPhys.add(panelApplyPhys, BorderLayout.EAST);
-		btnApplyPhys = new JButton("Apply");
-		btnApplyPhys.addActionListener(this);			// ND added 5th Feb 16
-
-		btnApplyPhys.setBackground(new Color(249,184,172));
-		panelApplyPhys.add(btnApplyPhys, BorderLayout.SOUTH);
-
+		if (isEditMode == true){								// ND added 5th Apr 16
+			panelApplyPhys = new JPanel();
+			panelApplyPhys.setLayout(new BorderLayout());
+	 		panelMainPhys.add(panelApplyPhys, BorderLayout.EAST);
+			btnApplyPhys = new JButton("Apply");
+			btnApplyPhys.addActionListener(this);			// ND added 5th Feb 16
+	
+			btnApplyPhys.setBackground(new Color(249,184,172));
+			panelApplyPhys.add(btnApplyPhys, BorderLayout.SOUTH);
+		}
 		panelPhys = new JPanel();
 		panelMainPhys.add(panelPhys, BorderLayout.CENTER);
 		panelPhys.setLayout(new GridBagLayout());
@@ -1345,15 +1416,16 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 		panelMainPsyc.setLayout(new BorderLayout());
 		tabPane.add(panelMainPsyc, "Mental Status Assessment");
 		
-		panelApplyPsyc = new JPanel();
-		panelApplyPsyc.setLayout(new BorderLayout());
- 		panelMainPsyc.add(panelApplyPsyc, BorderLayout.EAST);
-		btnApplyPsyc = new JButton("Apply");
-		btnApplyPsyc.addActionListener(this);			// ND added 5th Feb 16
-
-		btnApplyPsyc.setBackground(new Color(249,184,172));
-		panelApplyPsyc.add(btnApplyPsyc, BorderLayout.SOUTH);
-
+		if (isEditMode == true){									// ND added 5th Apr 16
+			panelApplyPsyc = new JPanel();
+			panelApplyPsyc.setLayout(new BorderLayout());
+	 		panelMainPsyc.add(panelApplyPsyc, BorderLayout.EAST);
+			btnApplyPsyc = new JButton("Apply");
+			btnApplyPsyc.addActionListener(this);			// ND added 5th Feb 16
+	
+			btnApplyPsyc.setBackground(new Color(249,184,172));
+			panelApplyPsyc.add(btnApplyPsyc, BorderLayout.SOUTH);
+		}
 		panelPsyc = new JPanel();
 		panelPsyc.setLayout(new GridBagLayout());
 		panelMainPsyc.add(panelPsyc, BorderLayout.CENTER);
@@ -1660,14 +1732,15 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 		panelMainAbus.setLayout(new BorderLayout());
 		tabPane.add(panelMainAbus, "Abuse");
 		
-		panelApplyAbus = new JPanel();
-		panelApplyAbus.setLayout(new BorderLayout());
- 		panelMainAbus.add(panelApplyAbus, BorderLayout.EAST);
-		btnApplyAbus = new JButton("Apply");
-		btnApplyAbus.addActionListener(this);
-		btnApplyAbus.setBackground(new Color(249,184,172));
-		panelApplyAbus.add(btnApplyAbus, BorderLayout.SOUTH);
-
+		if (isEditMode == true){									// ND added 5th Apr 16
+			panelApplyAbus = new JPanel();
+			panelApplyAbus.setLayout(new BorderLayout());
+	 		panelMainAbus.add(panelApplyAbus, BorderLayout.EAST);
+			btnApplyAbus = new JButton("Apply");
+			btnApplyAbus.addActionListener(this);
+			btnApplyAbus.setBackground(new Color(249,184,172));
+			panelApplyAbus.add(btnApplyAbus, BorderLayout.SOUTH);
+		}
 		panelAbus = new JPanel();
 		panelAbus.setLayout(new GridBagLayout());
 		panelMainAbus.add(panelAbus, BorderLayout.CENTER);
@@ -1731,15 +1804,16 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 		panelMainStre.setLayout(new BorderLayout());
 		tabPane.add(panelMainStre, "Strengths");
 		
-		panelApplyStre = new JPanel();
-		panelApplyStre.setLayout(new BorderLayout());
- 		panelMainStre.add(panelApplyStre, BorderLayout.EAST);
-		btnApplyStre = new JButton("Apply");
-		btnApplyStre.addActionListener(this);			// ND added 5th Feb 16
-
-		btnApplyStre.setBackground(new Color(249,184,172));
-		panelApplyStre.add(btnApplyStre, BorderLayout.SOUTH);
-
+		if (isEditMode == true){								// ND added 5th Apr 16
+			panelApplyStre = new JPanel();
+			panelApplyStre.setLayout(new BorderLayout());
+	 		panelMainStre.add(panelApplyStre, BorderLayout.EAST);
+			btnApplyStre = new JButton("Apply");
+			btnApplyStre.addActionListener(this);			// ND added 5th Feb 16
+	
+			btnApplyStre.setBackground(new Color(249,184,172));
+			panelApplyStre.add(btnApplyStre, BorderLayout.SOUTH);
+		}
 		panelStre = new JPanel();
 		panelStre.setLayout(new GridBagLayout());
 		panelMainStre.add(panelStre, BorderLayout.CENTER);
@@ -1960,13 +2034,15 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 //		panelApplySumm = new JPanel();					// ND added 5th Mar 16
 //		panelApplySumm.setLayout(new BorderLayout());
 // 		panelSumm.add(panelApplySumm, BorderLayout.EAST);
-		btnApplySumm = new JButton("Apply");
-		btnApplySumm.addActionListener(this);			
-		btnApplySumm.setBackground(new Color(249,184,172));
-//		panelApplySumm.add(btnApplySumm, BorderLayout.SOUTH);
-		panelSumm.add(btnApplySumm, SwingUtils.getConstraints(2, 2, 1, 0, 0, 
-				GridBagConstraints.SOUTHEAST, GridBagConstraints.NONE,
-				4, 5, 4, 5));
+
+		// Apply button not required for Summary panel.
+//		btnApplySumm = new JButton("Apply");
+//		btnApplySumm.addActionListener(this);			
+//		btnApplySumm.setBackground(new Color(249,184,172));
+////		panelApplySumm.add(btnApplySumm, BorderLayout.SOUTH);
+//		panelSumm.add(btnApplySumm, SwingUtils.getConstraints(2, 2, 1, 0, 0, 
+//				GridBagConstraints.SOUTHEAST, GridBagConstraints.NONE,
+//				4, 5, 4, 5));
 		
 		JPanel panelBottButtons = new JPanel();
 		panelBottom.add(panelBottButtons, BorderLayout.SOUTH);
@@ -1991,9 +2067,15 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 		// TODO Auto-generated method stub
 		
 		if (e.getSource().equals(btnAdd)){
-			//add row to the table
 			CounseleeRelativeIndivObj obj = new CounseleeRelativeIndivObj();
-			
+
+			if (txtRelName != null){								// ND added 1st Apr 16
+			//add row to the table
+				// txtIndivID cannot be null if record being edited but can be null if new record being added i.e. isEditMode = false
+			if (isEditMode == true){				// ND added 21st Apr 16
+				if (txtIndivID != null)
+					obj.setCaseNumber(txtIndivID.getText());
+			}
 			obj.setRelName(txtRelName.getText());
 			obj.setRelAge(txtRelAge.getText());
 			obj.setRelationship(cmbRelShip.getSelectedItem().toString());
@@ -2003,17 +2085,26 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			obj.setRelComments(txtRelComments.getText());
 			
 			//add the rest of the code
-			
 			modelFamHist.addRowObject(obj);
+			}
 		}
+		
 		if (e.getSource().equals(btnApplyAbus)){
 			updateAbuseHist();
 		}
 
-		// start ND added 05th Feb 16
+// start ND added 05th Feb 16
 		else if (e.getSource().equals(btnApplyFamHist)) {
-			updateFamReln();
+			updateFamHist();
 		}
+	// start ND added 25th Apr 16
+		else if (e.getSource().equals(menuRelEdit)){
+			editFamHist();
+		}
+		else if (e.getSource().equals(menuRelRemove)){
+			delRelFamHist();
+		}
+	// end ND added 25th Apr 16
 		else if (e.getSource().equals(btnApplyFamEnv)){
 			updateFamEnv();
 		}
@@ -2041,13 +2132,23 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 		else if (e.getSource().equals(btnApplyLegal)){
 			updateLegal();
 		}
-		// end ND added 5th Feb 16
+// end ND added 5th Feb 16
 		
 		else if (e.getSource().equals(btnCancel)){
 			this.setVisible(false);
 		}
+		// ND edited 5th Apr 16
 		else if (e.getSource().equals(btnSave)){
-			save();
+			if (chkIntegIndiv() == true){
+
+			if (isEditMode == true){	
+				updateCnslee();
+				updateSumm();
+			}
+			else {
+					save();
+			}
+		}
 		}
 		else if (e.getSource().equals(chkEduAttend)){
 			enableSchool();
@@ -2061,25 +2162,31 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 		cbEduSchExp.setEnabled(chkEduAttend.isSelected());
 	}
 	
-	private void save(){
+	// ND edited 5th Apr 16
+	private boolean chkIntegIndiv(){
 		
 		if (txtIndivLName.getText().trim().isEmpty()){
 			JOptionPane.showMessageDialog(this, "Please enter a name for the beneficiary.");
-			return;
+			return (false);
 		}
 		if (cbPartnerOrg.getSelectedIndex() < 0){
 			JOptionPane.showMessageDialog(this, "Please enter a partner organization for beneficiary.");
-			return;
+			return (false);
 		}
 		if (cbLocation.getSelectedIndex() < 0){
 			JOptionPane.showMessageDialog(this, "Please enter a location for beneficiary.");
-			return;
+			return (false);
 		}
 		if (txtAge.getText().trim().isEmpty()){
 			JOptionPane.showMessageDialog(this, "Please enter age for beneficiary.");
-			return;
+			return (false);
 		}
 		
+		return (true);
+	}
+	
+	
+	private void save() {
 		try{
 			
 			//Save counsellee basic data
@@ -2093,6 +2200,13 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			cnslee.setLocation(cbLocation.getSelectedItem().toString());
 			cnslee.setParentOrg(cbPartnerOrg.getSelectedItem().toString());
 			cnslee.setDate(dateAssessment.getDate());
+			
+			cnslee.setDob(dateDOB.getDate());								// ND added 02nd Apr 16
+			cnslee.setDtTerm(dateTermination.getDate());					// ND added 02nd Apr 16
+			cnslee.setGender(cbGender.getSelectedItem().toString());		// ND added 02nd Apr 16
+
+			
+			
 			
 			//Save counselee History details
 			CounseleeHistoryObj cnslHist = new CounseleeHistoryObj();
@@ -2259,6 +2373,34 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			e.printStackTrace();
 		}
 	}
+	
+						// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Beginning of Updating each tab ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+	
+	private void updateCnslee() {								// ND added 5th Apr 16
+		Counsellee cnslee = new Counsellee();
+		cnslee.setName(new PersonName(txtIndivLName.getText() +"^" + 
+							txtIndivFName.getText() + "^" +
+							txtIndivMName.getText()));
+		cnslee.setOtherName(txtAlias.getText());
+		System.out.println(cnslee.getOtherName() + "%%%%%%%%%%%%%%%%%");
+		cnslee.setAge(Integer.parseInt(txtAge.getText()));
+		cnslee.setLocation(cbLocation.getSelectedItem().toString());
+		cnslee.setParentOrg(cbPartnerOrg.getSelectedItem().toString());
+		cnslee.setDate(dateAssessment.getDate());
+		
+		cnslee.setDob(dateDOB.getDate());								
+		cnslee.setDtTerm(dateTermination.getDate());					
+		cnslee.setGender(cbGender.getSelectedItem().toString());		
+		cnslee.setCaseNumber(txtIndivID.getText().toString());						
+		System.out.println("Old ID b4 updating:" + txtIndivID.getText().toString());
+		
+		if (ACEConnector.getInstance(codebase).updateCounselee(cnslee)){
+			System.out.println("INTAKE FORM DLG - Update Counselee basic info success");
+		}else{
+			JOptionPane.showMessageDialog(this, "Error updating Counselee basic info to server","Error", JOptionPane.ERROR_MESSAGE);
+		}
+
+	}
 
 	private void updateAbuseHist(){
 		AbuseIndivObj abuObj = new AbuseIndivObj();
@@ -2294,10 +2436,58 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 		}
 	}
 	
-	private void updateFamReln() {
+	private void updateFamHist() {															// ND edited on 19th Apr 16
+		Vector vFamHistObj ;
+		String caseNum = null;
+		vFamHistObj = modelFamHist.getRowObjects();
+		
+//		if (vFamHistObj.size() > 0) {																		// ND added 19th Apr 16
+		
+		caseNum = cnslee.getCaseNumber();													// ND added 02nd May 16
+		if (ACEConnector.getInstance(codebase).updateCnslReln(vFamHistObj, caseNum)) {
+			System.out.println("INTAKE FORM DLG - Update Family History success");
+		} else {
+			JOptionPane.showMessageDialog(this, "Error updating Family History to server" , "Error", JOptionPane.ERROR_MESSAGE);
+		}
+//		}
 	}
 	
-	
+	private void editFamHist() {											// ND added 15th Apr 16
+		Vector <CounseleeRelativeIndivObj> vFamHistEditObj;
+		CounseleeRelativeIndivObj cnslRObj;
+		int selRow;
+		
+		selRow = tblRelatives.getSelectedRow();
+		cnslRObj = modelFamHist.getRowObject( tblRelatives.getSelectedRow());
+//		vFamHistEditObj = modelFamHist.getRowObjects( );
+		if (cnslRObj != null){
+		
+	//		System.out.println("The relative details for editing: " + cnslRObj.getRelationship().toString());
+			txtRelName.setText(cnslRObj.getRelName().toString() );
+			txtRelAge.setText(cnslRObj.getRelAge().toString());
+			txtRelComments.setText(cnslRObj.getRelComments().toString());
+			txtRelProfession.setText(cnslRObj.getRelProfession().toString());
+			cmbRelShip.setSelectedItem(cnslRObj.getRelationship());
+			chkRelAware.setSelected(cnslRObj.isRelAwareOfVictimsSituation());
+			cmbRelStre.setSelectedItem(cnslRObj.getRelStrength().toString());
+			modelFamHist.delTableRow(selRow);
+		}
+	}
+	private void delRelFamHist() {												// ND added 26th Apr 16
+		int[] selRows = new int[20];
+		Vector<CounseleeRelativeIndivObj> vFamRel = new Vector<CounseleeRelativeIndivObj>();
+		int selRow;
+		if (tblRelatives.getSelectedRowCount() > 0){
+			selRows = tblRelatives.getSelectedRows();
+			for (int i = 0; i < selRows.length; i++){
+				CounseleeRelativeIndivObj cnslRelObj = new CounseleeRelativeIndivObj();
+				cnslRelObj = modelFamHist.getRowObject(selRows[i]);
+				vFamRel.add(cnslRelObj);
+			}
+			modelFamHist.delTableRows(vFamRel, selRows);
+			//modelFamHist.delTableRow(selRows[i]);
+		} 
+	}
 	private void updateEdu(){
 		EducationHistIndivObj eduObj = new EducationHistIndivObj();
 		eduObj.setCaseNumber(cnslee.getCaseNumber());
@@ -2487,17 +2677,30 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			return;
 		System.out.println("The values in the list b4 Jlist populate: " + vItems.elementAt(a) + ", "+ vItems.elementAt(a+1));
 		lst.setListData(vItems);
+		
 	}
-
+								// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Beginning of setEditValues ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
 	private void setEditValues(){
 	try {
+//		Counsellee cnslee_all = cnsleeHist.getCounseleeObj();
+		
 		txtIndivLName.setText(cnslee.getName().getLastName());
+// start ND added / edited on 2nd Apr 16
+		txtIndivFName.setText(cnslee.getName().getFName());
+		txtIndivMName.setText(cnslee.getName().getMName());
+		txtAlias.setText(cnslee.getOtherName());				
+		cbPartnerOrg.setSelectedItem(cnslee.getParentOrg());				
+		System.out.println("Displaying Parent Orgn: " + cnslee.getParentOrg() + " at: " + cnslee.getLocation() + " age: " + cnslee.getAge()
+				+ " Term: " + cnslee.getDtTerm());
+		cbLocation.setSelectedItem(cnslee.getLocation());
 		txtAge.setText(String.valueOf(cnslee.getAge()));
-		txtAlias.setText(cnslee.getOtherName());
-	//	cbLocation.setSelectedItem((cnslee.getLocation()));
-	//	cbPartnerOrg.setSelectedItem(cnslee.getParentOrg());
+		dateDOB.setDate(cnslee.getDob());
+		txtIndivID.setText(cnslee.getCaseNumber());
 		dateAssessment.setDate(cnslee.getDate());
-	
+		dateTermination.setDate(cnslee.getDtTerm());
+		
+// end ND added / edited on 2nd Apr 16
+		
 		if (cnsleeHist == null){
 			System.out.println("Counselee History obj null in setEditValues");
 			return;
@@ -2514,6 +2717,7 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			System.out.println("Abuse Object for editing is null");
 		
 		EducationHistIndivObj eduObj = cnsleeHist.geteduIndivObj();
+//		System.out.println(eduObj.getEduComm());
 		if (eduObj != null){
 			Vector vEduNonForm = eduObj.getEduNonForm();
 			System.out.println("B4 editing the non formal Edu list: " );
@@ -2538,11 +2742,20 @@ public class IntakeFormDlg extends JDialog implements ActionListener, ACEDefines
 			chkEduLitClass.setSelected(eduObj.isEduLitClass());
 			chkEduCont.setSelected(eduObj.isEduCont());
 			txtEduComm.setText(cnsleeHist.geteduIndivObj().getEduComm());
-		}
+		} else System.out.println("No information to pass to the Intake form Education tab");
+		
 		
 //		vCnslRelnObj = modelFamHist.getRowObjects();
 ///		cnslHist.setvCnslRelnObj(vCnslRelnObj);
-		
+// start ND added 19th Apr 16
+		Vector <CounseleeRelativeIndivObj> vCnslRelnObj = cnsleeHist.getvCnslRelnObj();
+		modelFamHist.setRelTableValues(vCnslRelnObj);
+//		for (int i = 0; i < vCnslRelnObj.size(); i++){
+//			CounseleeRelativeIndivObj RelnObj = new CounseleeRelativeIndivObj();
+//			RelnObj = vCnslRelnObj.elementAt(i);
+//			modelFamHist.addRowObject(RelnObj);
+//		}
+// end ND added 19th Apr 16
 		
 		FamilyEnvIndivObj fEnvObj = cnsleeHist.getfamEnvIndivObj();
 		if (fEnvObj != null) { 

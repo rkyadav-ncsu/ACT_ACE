@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 
 import com.act.common.SwingUtils;
 
-
 public class JAceList extends JPanel implements ActionListener{
 	
 	private int height = 26;
@@ -62,6 +61,7 @@ public class JAceList extends JPanel implements ActionListener{
 //		add(btnDownArrow);
 		
 		popup = new JPopupMenu();
+		popup.setAutoscrolls(true);
 		setPopupWidth();
 		
 //		setBackground(Color.red);
@@ -106,13 +106,35 @@ public class JAceList extends JPanel implements ActionListener{
 		}
 	}
 	
+//	public void actionPerformed(ActionEvent e) {
+//		Object objSource = e.getSource();
+//		
+//		if (objSource == btnDownArrow){
+//			if (!popup.isVisible()) {
+//	            Point p = txtValues.getLocationOnScreen();
+//	            popup.setInvoker(btnDownArrow);
+//	            popup.setLocation((int) p.getX(),
+//	                    (int) p.getY() + btnDownArrow.getHeight());
+//	            popup.setVisible(true);
+//	        } else {
+//	        	popup.setVisible(false);
+//	        }
+//		}else if (vMenuItems != null && vMenuItems.contains(objSource) ){
+//			JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)objSource;
+//			setText();
+//			popup.setVisible(true);
+//		}
+//		
+//		
+//	}
+	
 	public void actionPerformed(ActionEvent e) {
 		Object objSource = e.getSource();
 		
 		if (objSource == btnDownArrow){
 			if (!popup.isVisible()) {
 	            Point p = txtValues.getLocationOnScreen();
-	            popup.setInvoker(btnDownArrow);
+//	            popup.setInvoker(btnDownArrow);
 	            popup.setLocation((int) p.getX(),
 	                    (int) p.getY() + btnDownArrow.getHeight());
 	            popup.setVisible(true);
@@ -124,8 +146,6 @@ public class JAceList extends JPanel implements ActionListener{
 			setText();
 			popup.setVisible(true);
 		}
-		
-		
 	}
 	
 	private void setText(){

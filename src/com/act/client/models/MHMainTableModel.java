@@ -10,7 +10,6 @@ import javax.swing.table.TableModel;
 
 import com.act.common.Counsellee;
 import com.act.common.PersonName;
-import com.mysql.jdbc.UpdatableResultSet;
 
 public class MHMainTableModel extends AbstractTableModel{
 
@@ -28,7 +27,7 @@ public class MHMainTableModel extends AbstractTableModel{
 	
 	public void setList (Vector<Counsellee> vCounselee){
 		this.vCounselee = vCounselee;
-		System.out.println(vCounselee.size());
+//		System.out.println(vCounselee.size());
 		fireTableDataChanged();
 		//fireTableStructureChanged();
 		fireTableRowsInserted(0, 2);

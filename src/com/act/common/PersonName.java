@@ -63,6 +63,19 @@ public class PersonName implements Serializable{
 		}
 		return sFormatName;
 	}
+	
+	public static String getFormattedName(String name){
+		if (name == null)
+			return "";
+		
+		StringTokenizer tok = new StringTokenizer(name, "^");
+		String sFormatName = "";
+		while (tok.hasMoreTokens()){
+			sFormatName += tok.nextToken();
+			sFormatName += " ";
+		}
+		return sFormatName;
+	}
 	public String toString(){
 		return name;
 	}
@@ -72,6 +85,29 @@ public class PersonName implements Serializable{
 			return "";
 		
 		return (name.substring(0, name.indexOf("^")));
+	}
+
+	public String getFName() {
+		String[] cnsl_names = new String[3];
+		System.out.println("The full name of the counselee is " + name);
+		StringTokenizer st = new StringTokenizer(name, "^");
+		int t = 0;
+		while(st.hasMoreTokens()){
+			cnsl_names[t] = st.nextToken();
+			t++;
+		}
+		return (String)cnsl_names[1];
+	}
+	
+	public String getMName() {
+		String[] cnsl_names = new String[3];
+		StringTokenizer st = new StringTokenizer(name, "^");
+		int t = 0;
+		while(st.hasMoreTokens()){
+			cnsl_names[t] = st.nextToken();
+			t++;
+		}
+		return (String)cnsl_names[2];
 	}
 
 }

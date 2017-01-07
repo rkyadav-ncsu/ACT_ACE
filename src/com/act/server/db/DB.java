@@ -18,32 +18,43 @@ public class DB{
 	//////////////////////////
 	//Define all table names here
 	public static final String DB_TBL_USER = "userstbl";
-	public static final String DB_TBL_INDIV = "tblindiv";
-	public static final String DB_TBL_ADDICTION = "addictionstbl";	// ND added on 10th Sept
-    public static final String DB_TBL_LANGUAGE = "languagetbl";		// ND added on 9th Sept
-	public static final String DB_TBL_NONFORMALEDUCATION = "nonformaleducationtbl";	// ND added on 10th Sept
-    public static final String DB_TBL_RELATIONSHIP = "relativetypestbl";  	// ND added on 10th Sept
-	public static final String DB_TBL_RELIGION = "religionstbl";	// ND added on 9th Sept
+	public static final String DB_TBL_GROUPSTBL = "groupstbl";					
+	public static final String DB_TBL_USERSANDGROUPS = "usersandgroupstbl";		
 
-	public static final String DB_TBL_COPINGSKILL = "copingskillstbl"; // ND added on 19th Sept
-	public static final String DB_TBL_RECREATION = "recreationtbl";		// ND added on 12th Oct
+	public static final String DB_TBL_INDIV = "tblindiv";
+	public static final String DB_TBL_ADDICTION = "addictionstbl";	
+    public static final String DB_TBL_LANGUAGE = "languagetbl";		
+	public static final String DB_TBL_NONFORMALEDUCATION = "nonformaleducationtbl";	
+    public static final String DB_TBL_RELATIONSHIP = "relativetypestbl";  	
+	public static final String DB_TBL_RELIGION = "religionstbl";	
+
+	public static final String DB_TBL_COPINGSKILL = "copingskillstbl";
+	public static final String DB_TBL_RECREATION = "recreationtbl";		
 	
-	public static final String DB_TBL_ORGANISATION = "organisationstbl";	// ND added on 13th Oct
-	public static final String DB_TBL_CAREHOME = "carehomestbl";	// ND added on 24th Oct
+	public static final String DB_TBL_ORGANISATION = "organisationstbl";
+	public static final String DB_TBL_CAREHOME = "carehomestbl";	
 	
-	public static final String DB_TBL_ABUSEHIST = "tblindivabusehist";				// ND added on 1st Nov
-	public static final String DB_TBL_EDUHIST = "tblIndivEducationHist";			// ND added on 1st Nov
-	public static final String DB_TBL_FAMENV = "tblindivfamilyenvironment";		// ND added on 27th Oct
-	public static final String DB_TBL_CNSLRELN = "tblIndivFamilyHist";			// ND added on 29th Oct
-	public static final String DB_TBL_PHYSICALHIST = "tblIndivPhysicalHist";	// ND added on 29th Oct
-	public static final String DB_TBL_MENTALSTAT = "tblIndivPsychologicalHist";	// ND added on 29th Oct	
-	public static final String DB_TBL_SOCIALHIST = "tblIndivSocialHist";		// ND added on 29th Oct
-	public static final String DB_TBL_CNSLSTRENGTH = "tblIndivStrengths";		// ND added on 29th Oct
-	public static final String DB_TBL_CNSLSUMM = "tblIndivSummary";				// ND added on 29th Oct	
-	public static final String DB_TBL_VOCHIST = "tblIndivVocationalHist";		// ND added on 29th Oct	
-	public static final String DB_TBL_LEGAL = "tblIndivLegalHist";				// ND added on 18th Dec
+	public static final String DB_TBL_ABUSEHIST = "tblindivabusehist";
+	public static final String DB_TBL_EDUHIST = "tblindiveducationHist";
+	public static final String DB_TBL_FAMENV = "tblindivfamilyenvironment";		
+	public static final String DB_TBL_CNSLRELN = "tblindivfamilyHist";			
+	public static final String DB_TBL_PHYSICALHIST = "tblindivphysicalHist";	
+	public static final String DB_TBL_MENTALSTAT = "tblindivpsychologicalhist";		
+	public static final String DB_TBL_SOCIALHIST = "tblindivsocialhist";		
+	public static final String DB_TBL_CNSLSTRENGTH = "tblindivstrengths";		
+	public static final String DB_TBL_CNSLSUMM = "tblindivsummary";					
+	public static final String DB_TBL_VOCHIST = "tblindivvocationalhist";			
+	public static final String DB_TBL_LEGAL = "tblindivLegalhist";				
 	public static final String DB_TBL_CHK_LST_TSC40 = "tsc40assessment";
-	public static final String DB_TBL_CHK_LST_TSC54 = "tsc40assessment";
+	public static final String DB_TBL_CHK_LST_TSC54 = "tsc54assessment";
+	
+	public static final String DB_TBL_COUNSELLING_SESSION = "counsellingsession";
+	public static final String DB_TBL_COUNSELINGTHERAPY = "counselingtherapy";		
+
+	//TF-CBT
+	public static final String DB_TBL_TFCBT_STAGE_MASTER = "tfcbtstagemaster";
+	public static final String DB_TBL_TFCBT_TASK_MASTER = "tfcbttaskmaster";
+	public static final String DB_TBL_TFCBT_CNSLEE_TASK = "counselleetfcbttask";
 
 	//////////////////////////
 	//   COLUMNS
@@ -51,10 +62,31 @@ public class DB{
 	//Define all column names here
 	
 	//User table columns
-	public static final String DB_COL_USER_USERNAME = "UserName";
-	public static final String DB_COL_USER_USERID = "UserId";
-	public static final String DB_COL_USER_PWD = "Password";
-	
+//	public static final String DB_COL_USER_USERNAME = "UserName";
+//	public static final String DB_COL_USER_USERID = "UserId";
+//	
+	public static final String DB_COL_USER_PWD = "UserPassword";
+	public static final String DB_COL_USER_ID = "User_ID";
+	public static final String DB_COL_USER_FNAME = "UserFName";
+	public static final String DB_COL_USER_MNAME = "UserMName";
+	public static final String DB_COL_USER_LNAME = "UserLName";
+	public static final String DB_COL_USER_GENDER = "UserGender";
+	public static final String DB_COL_USER_DOB = "UserDOB";
+	public static final String DB_COL_USER_ADDRESS = "UserAddress";
+	public static final String DB_COL_USER_PIN = "UserPin";
+	public static final String DB_COL_USER_MOB = "UserMobile";
+	public static final String DB_COL_USER_PHONE = "UserPhone";
+	public static final String DB_COL_USER_DESIG = "UserDesignation";
+	public static final String DB_COL_USER_EMAIL = "UserEmail";
+
+	// UsersandGroupstbl table columns
+	public static final String DB_COL_USER_GRP_USRID = "User_ID";
+	public static final String DB_COL_USER_GRP_GRPNAME = "GroupName";
+
+	// groupstbl table columns
+	public static final String DB_COL_GROUP_NAME = "GroupName";
+	public static final String DB_COL_GROUP_DESC = "GroupDesc";
+
 	//Indiv table columns
 	public static final String DB_COL_INDIV_ID= "Indiv_Id";
 	public static final String DB_COL_INDIV_NAME= "Indiv_Name";
@@ -63,30 +95,56 @@ public class DB{
 	public static final String DB_COL_INDIV_PARTNER_ORGN= "PartnerOrgn";
 	public static final String DB_COL_INDIV_OTHER_NAME= "OName";
 	public static final String DB_COL_INDIV_DATE_ASSESSMENT= "DtAssessment";
-	public static final String DB_COL_INDIV_DOB = "UserId";
+	public static final String DB_COL_INDIV_AGE  = "Age";						// ND added 2nd Apt 16
+	public static final String DB_COL_INDIV_HOME = "HomeLocation"; 				// ND added 2nd Apr 16
+	public static final String DB_COL_INDIV_DOB = "DOB";						// ND edited 2nd Apr 16
+	public static final String DB_COL_INDIV_DTTERM = "DtTermination";			// ND added 2nd Apr 16
+	public static final String DB_COL_INDIV_GENDER = "Gender";					// ND added 2nd Apr 16
+
+	//counselingtherapy table columns
+	public static final String DB_COL_COUNSELINGTHERAPY_ID		= "CounselTherapy_ID";
+	public static final String DB_COL_COUNSELINGTHERAPYDESC 	= "TherapyDesc";
 
 	// Addictions table columns
 	public static final String DB_COL_ADDICTION_ID = "Addiction_ID";
 	public static final String DB_COL_ADDICTION = "Addiction";
+
 	// CopingSkillstbl table columns			ND added on 24th Sep
 	public static final String DB_COL_COPINGSKILL_ID = "CopingSkills_ID";
 	public static final String DB_COL_COPINGSKILL = "CopingSkills";
+	
 	// Languagetbl table columns				ND added on 9th Sept
 	public static final String DB_COL_LANGUAGE_ID = "LanguageID";
 	public static final String DB_COL_LANGUAGE = "Language";
+	
 	// Nonformaleduationtbl table columns		ND added on 10th Sept
 	public static final String DB_COL_NONFORMALEDU_ID = "NonFormalEdu_ID";
 	public static final String DB_COL_NONFORMALEDUCATION = "NonFormalEducation";
+	
 	// Relativetypestbl table columns			ND added on 10th Sept
 	public static final String DB_COL_RELATIVETYPE_ID = "RelativeTypesID";
 	public static final String DB_COL_RELATIVETYPE = "RelativeTypes";
+	
 	// Religionstbl table columns				ND added on 9th Sept
 	public static final String DB_COL_RELIGION_ID = "ReligionID";
 	public static final String DB_COL_RELIGION = "Religion";
+	
 	// Recreationtbl table columns				ND added on 12th Oct
 	public static final String DB_COL_RECREATION_ID = "Recreation_ID";
 	public static final String DB_COL_RECREATIONACTIVITY = "RecreationActivity";  	
 	
+	public static final String DB_TBL_SERVICETYPES = "servicetypestbl";	// ND added on 4th Aug 16;
+	public static final String DB_COL_SERVICETYPES_ID = "ServiceTypes_ID";
+	public static final String DB_COL_SERVICETYPES = "ServiceTypesName";
+
+	public static final String DB_TBL_PINCODE = "pincodestbl";				// ND added on 25th Aug 16
+	
+	// Pincodestbl								ND added on 25th Aug 16
+	public static final String DB_COL_PO = "PostOffice";
+	public static final String DB_COL_PINCODE = "Pincode";
+	public static final String DB_COL_CITYDIST = "CityDistrict";
+	public static final String DB_COL_SATE = "State";
+
 	// Organisationstbl table columns
 	public static final String DB_COL_ORGN_ID = "Orgn_ID";
 	public static final String DB_COL_ORGN_NAME = "Orgn_Name";
@@ -105,7 +163,7 @@ public class DB{
 	public static final String DB_COL_ORGN_EMAIL = "Orgn_Email";
 	public static final String DB_COL_ORGN_DENOMINATION = "Denomination";
 	public static final String DB_COL_ORGN_DETAILS = "Orgn_Details";
-	public static final String DB_COL_ORGN_SERVICETYPES_ID = "Service_types";
+	public static final String DB_COL_ORGN_SERVICETYPES = "Service_types";
 	public static final String DB_COL_ORGN_SERVDETAILS = "Orgn_ServDetails";
 	
 	// 	CareHomestbl table columns
@@ -117,19 +175,15 @@ public class DB{
 	public static final String DB_COL_CAREHOME_TYPE = "Type";			//Text		255
 
 	
-	// tblIndivAbuseHist table columns									ND added on 1st Nov
-	
 	public static final String DB_COL_ABUSEHIST_ABUSEHIST_ID = "AbuseHist_ID";		//	Long Integer	4	Not being used
 	public static final String DB_COL_ABUSEHIST_INDIV_ID = "Indiv_ID";				//	Long Integer	4
 	public static final String DB_COL_ABUSEHIST_VERBAL = "Verbal";					//	Memo	-
 	public static final String DB_COL_ABUSEHIST_PHYSICAL = "Physical";				//	Memo	-
 	public static final String DB_COL_ABUSEHIST_SEXUAL = "SexuaL";					//	Memo	-
 	public static final String DB_COL_ABUSEHIST_NEGLECT = "Neglect";				//	Memo	-
-	// public static final String DB_COL_ABUSEHIST_ABUSEENTRY_DT = "AbuseEntry_Dt";	//	Date/Time	8		Not being used
 	public static final String DB_COL_ABUSEHIST_ABUSECOMMENTS = "AbuseComment";	//	Memo	-
 
 	// tblIndivEducationHist table columns								ND added on 1st Nov
-	// public static final String DB_COL_EDUHIST_ED_ID = "Ed_ID"						//	Long Integer	4	Not being used
 	public static final String DB_COL_EDUHIST_INDIV_ID = "indivID";					//	Long Integer	4
 	public static final String DB_COL_EDUHIST_ATTENDEDSCHOOL = "AttendedSchool";	//	Yes/No	1
 	public static final String DB_COL_EDUHIST_WHEREED = "WhereEd";					//	Text	50
@@ -139,12 +193,8 @@ public class DB{
 	public static final String DB_COL_EDUHIST_CONTINUESTUDIES = "ContinueStudies";	//	Yes/No	1
 	public static final String DB_COL_EDUHIST_NON_FORMALED = "Non_FormalEd";		// 	Long Integer	4
 	public static final String DB_COL_EDUHIST_EDCOMMENTS = "EdComments";			//	Memo	-
-//	public static final String DB_COL_EDUHIST_EDENTRY_DT = "EdEntry_dt";			//	Date/Time	8		Not being used
 	
 		
-	// tblIndivfamilyenvironment table columns							ND added on 27th Oct
-//	public static final String DB_COL_FAMENV_ID = "FamEnvirn_ID";			// Not being used
-	
 	public static final String DB_COL_FAMENV_INDIV_ID = "Indiv_ID";
 	public static final String DB_COL_FAMENV_GETSALONG = "GetsAlong";		//	Text 	15
 	public static final String DB_COL_FAMENV_PHYABUSE = "PhysicalAbuse";	//	Text	15
@@ -277,6 +327,10 @@ public class DB{
 	//TSC54 Table columns
 	public static final String DB_COL_TSC54_ID  = "TSC54ChkLstId";
 	public static final String DB_COL_TSC54_CASE_ID = "CaseId";
+	public static final String DB_COL_TSC54_DATE 		= "AssessmentDate";
+	public static final String DB_COL_TSC54_DESC 		= "AssessmentDesc";
+	public static final String DB_COL_TSC54_CNSLR_ID 	= "CounsellorId";
+	public static final String DB_COL_TSC54_TOTAL_SCORE = "TotalScore";
 	public static final String DB_COL_TSC54_BAD_DREAMS = "BadDreams";
 	public static final String DB_COL_TSC54_FEEL_AFRAID_OF_BAD = "AfraidBadMightHappen"; 
 	public static final String DB_COL_TSC54_SCARY_IDEAS = "ScaryIdeas"; 
@@ -285,7 +339,7 @@ public class DB{
 	public static final String DB_COL_TSC54_ARGUE = "Argue"; 
 	public static final String DB_COL_TSC54_FEEL_LONELY = "FeelLonely"; 
 	public static final String DB_COL_TSC54_TOUCH_PRIV_PARTS = "TouchPrivParts"; 
-	public static final String DB_COL_TSC54_FEEL_SAD = "FeelSad,";
+	public static final String DB_COL_TSC54_FEEL_SAD = "FeelSad";
 	public static final String DB_COL_TSC54_REM_PAST_THINGS = "RemPastThings"; 
 	public static final String DB_COL_TSC54_GOING_AWAY = "GoingAwayInMind"; 
 	public static final String DB_COL_TSFC54_REM_SCARY_THINGS = "RemScaryThings"; 
@@ -334,8 +388,12 @@ public class DB{
 	
 	
 	//TSC40 Table columns
-	public static final String DB_COL_TSC40_ID  = "tsc40assessmentId";
-	public static final String DB_COL_TSC40_CASE_ID = "CaseId";
+	public static final String DB_COL_TSC40_ID  		= "tsc40assessmentId";
+	public static final String DB_COL_TSC40_CASE_ID 	= "CaseId";
+	public static final String DB_COL_TSC40_DATE 		= "AssessmentDate";
+	public static final String DB_COL_TSC40_DESC 		= "AssessmentDesc";
+	public static final String DB_COL_TSC40_CNSLR_ID 	= "CounsellorId";
+	public static final String DB_COL_TSC40_TOTAL_SCORE = "TotalScore";
 	public static final String DB_COL_TSC40_HEAD_ACHE = "HeadAche";
 	public static final String DB_COL_TSC40_INSOMNIA = "Insomnia";
 	public static final String DB_COL_TSC40_WGHT_LOSS = "WghtLoss";
@@ -377,16 +435,82 @@ public class DB{
 	public static final String DB_COL_TSC40_BREATHE_TROUBLE = "BreatheTrouble";
 	public static final String DB_COL_TSC40_SX_FEEL_UNTIMELY = "SxFeelingUntimely";
 	
+	//TFCBT Stage Master table columns
+	public static final String DB_COL_TFCBT_STAGE_NUMBER 	= "StageNumber";
+	public static final String DB_COL_TFCBT_STAGE_NAME	 	= "StageName";
+	public static final String DB_COL_TFCBT_STAGE_OBJECTIVE = "StageObjective";
+	public static final String DB_COL_TFCBT_STAGE_DESC		= "StageDescription";
 	
+	//TFCBT Task Master table columns
+	public static final String DB_COL_TFCBT_TASK_ID		 	= "TaskId";
+	public static final String DB_COL_TFCBT_TASK_STAGE_NUM	= "StageNumber";  
+	public static final String DB_COL_TFCBT_TASK_TYPE	 	= "TaskType";
+	public static final String DB_COL_TFCBT_TASK_TITLE		= "TaskTitle";
+	public static final String DB_COL_TFCBT_TASK_SUB_TITLE	= "TaskSubTitle";
+
+	//TFCBT Counsellee Task table columns
+	public static final String DB_COL_TFCBT_CNSLEE_TASK_ID		 		= "TaskId";
+	public static final String DB_COL_TFCBT_CNSLEE_ID		 			= "CounselleeId";
+	public static final String DB_COL_TFCBT_CNSLEE_TASK_STAGE_NUM		= "StageNumber";
+	public static final String DB_COL_TFCBT_CNSLEE_TASK_DATE_COMPLETED	= "DateCompleted";
+	public static final String DB_COL_TFCBT_CNSLEE_TASK_TYPE			= "TaskType";
+	public static final String DB_COL_TFCBT_CNSLEE_TASK_NOTES			= "Notes";
+	public static final String DB_COL_TFCBT_CNSLEE_TASK_STATUS			= "Status";
+	public static final String DB_COL_TFCBT_CNSLEE_TASK_CNSLR_ID		= "CounsellorId";
+	public static final String DB_COL_TFCBT_CNSLEE_TASK_CNSL_SESSION_ID	= "CounsellingSessionId";
+
+
+	//Counselling Sessions table
+	public static final String DB_COL_CNSLING_SESSION_ID 				= "CounsellingSessionId";
+	public static final String DB_COL_CNSLING_SESSION_CASE_ID 			= "CaseId";
+	public static final String DB_COL_CNSLING_SESSION_CNSLR_ID 			= "CounsellorId";
+	public static final String DB_COL_CNSLING_SESSION_DATE 				= "SessionDate";
+	public static final String DB_COL_CNSLING_SESSION_LOCATION 			= "Location";
+	public static final String DB_COL_CNSLING_SESSION_START_TIME		= "StartTime";
+	public static final String DB_COL_CNSLING_SESSION_DURATION			= "Duration";
+	public static final String DB_COL_CNSLING_SESSION_SETTING 			= "SessionSetting";
+	public static final String DB_COL_CNSLING_SESSION_OBJECTIVE 		= "SessionObjective";
+	public static final String DB_COL_CNSLING_SESSION_CONTENTS 			= "Contents/AreasConcern";
+	public static final String DB_COL_CNSLING_SESSION_CNSLR_COMMENTS 	= "CounselorComments";
+	public static final String DB_COL_CNSLING_SESSION_FOLLOW_UP_PREP 	= "FollowUpSessionPrep";
+	public static final String DB_COL_CNSLING_SESSION_THERAPY 			= "TherapyName";
+	public static final String DB_COL_CNSLING_SESSION_STATUS 			= "Status";
+	public static final String DB_COL_CNSLING_SESSION_CASE_MGMT 		= "CaseManagement";
+	public static final String DB_COL_CNSLING_SESSION_OPEN_TO_CNSLING 			= "OpenToCounseling";
+	public static final String DB_COL_CNSLING_SESSION_OPEN_TO_FUTURE_OUTSIDE 	= "OpenToFutureOutsideProst";
+	public static final String DB_COL_CNSLING_SESSION_OPEN_TO_GRP_HOME		 	= "OpentToGrpHome";
+	public static final String DB_COL_CNSLING_SESSION_APPETITE		 			= "Appetite";
+	public static final String DB_COL_CNSLING_SESSION_SLEEP			 			= "Sleep";
+	public static final String DB_COL_CNSLING_SESSION_RAPPORT		 			= "Rapport";
+	public static final String DB_COL_CNSLING_SESSION_APPEAR		 			= "Appearance";
+	public static final String DB_COL_CNSLING_SESSION_MOOD		 				= "Mood";
+	public static final String DB_COL_CNSLING_SESSION_AFFECT		 			= "Affect";
+	public static final String DB_COL_CNSLING_SESSION_THOUGHT		 			= "Thought";
+	public static final String DB_COL_CNSLING_SESSION_DISTURBANCES		 		= "Disturbances";
+	public static final String DB_COL_CNSLING_SESSION_ORIENTATION		 		= "Orientation";
+	public static final String DB_COL_CNSLING_SESSION_INSIGHT		 			= "Insight";
+	public static final String DB_COL_CNSLING_SESSION_JUDGEMENT		 			= "Judgement";
+
 	
-	
+	/**
+	 * Get the Database connection
+	 * @return
+	 */
 	public static Connection getConnection(){
 		
-<<<<<<< HEAD
-=======
+		String url = "jdbc:mysql://localhost:3306/";
+		String dbName = "act2c1";
+		String driver = "com.mysql.jdbc.Driver";
+		String userName = "root"; 
+		String password = "geena1@#$";
 		
 		
->>>>>>> refs/remotes/origin/master
+//		String url = "jdbc:mysql://localhost:3306/";
+//		String dbName = "ActAceTest1";
+//		String driver = "com.mysql.jdbc.Driver";
+//		String userName = "root"; 
+//		String password = "Raja123@#$";
+		
 		Connection conn = null;
 		try {
 			Class.forName(driver).newInstance();
@@ -445,7 +569,7 @@ public class DB{
 			for (int i = 0; i < vStringToJoin.size(); i++)
 			{	
 				if (i >0)
-					joinedString.append("'\'");
+					joinedString.append(",");							// ND edited 6th Apr 16
 			
 				joinedString.append(vStringToJoin.elementAt(i));
 				

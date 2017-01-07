@@ -23,6 +23,7 @@ import com.act.client.components.JAceDate;
 import com.act.common.Counsellee;
 import com.act.common.SwingUtils;
 import com.act.common.TSC40Obj;
+import com.act.common.TSC54Obj;
 
 public class TSC40MajorPanel extends  MHPanel implements ActionListener{
 	
@@ -31,8 +32,9 @@ public class TSC40MajorPanel extends  MHPanel implements ActionListener{
 	
 	JPanel panelTop, panelCenter, panelCnsleeDetails, panelSymtoms;
 	JLabel labelTitle;
-	JLabel cnsleName, cnslrName, caseNumber, testDate;
+	JLabel cnsleName, cnslrName, caseNumber, testDate, testDesc;
 	JLabel valCnsleName, valCnslrName, valCaseNumber;
+	JTextField txtTestDesc;
 	JAceDate valTestDate;
 	
 	JLabel headAche, insomnia, wghtLoss, stomachProb, sexProb, isolation, 
@@ -60,6 +62,8 @@ public class TSC40MajorPanel extends  MHPanel implements ActionListener{
 	
 	JButton btnGetScores, btnSave, btnClose;
 	Counsellee cnslee;
+	private boolean bEditMode = false;
+	TSC40Obj tsc40Obj = null;
 	
 	public TSC40MajorPanel(Counsellee cnslee, CounselleeMain parent){
 		this.cnslee = cnslee;
@@ -69,6 +73,23 @@ public class TSC40MajorPanel extends  MHPanel implements ActionListener{
 		}catch (Exception e){
 			e.printStackTrace();
 		}
+		
+	}
+
+	public TSC40MajorPanel(Counsellee cnslee, CounselleeMain parent,
+							TSC40Obj tsc40Obj){
+		this.cnslee = cnslee;
+		this.parent = parent;
+		this.tsc40Obj = tsc40Obj;
+		bEditMode = true;
+		
+		try{
+			initUI();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		
+		setEditValues();
 		
 	}
 
@@ -137,6 +158,18 @@ public class TSC40MajorPanel extends  MHPanel implements ActionListener{
 				GridBagConstraints.NORTHWEST, 
 				GridBagConstraints.NONE, 
 				10, 0, 5, 5));
+		
+		testDesc = new JLabel("Test Description: ");
+		panelCnsleeDetails.add(testDesc ,SwingUtils.getConstraints(0, 6, 1, 0,0, 
+				GridBagConstraints.NORTHWEST, 
+				GridBagConstraints.NONE, 
+				10, 25, 5, 5));
+		
+		txtTestDesc = new JTextField();
+		panelCnsleeDetails.add(txtTestDesc,SwingUtils.getConstraints(0, 7, 1, 1,1, 
+				GridBagConstraints.NORTHWEST,
+				GridBagConstraints.HORIZONTAL, 
+				10, 0, 5, 25));
 		
 		//////Symptoms Panel ////////////////
 		panelSymtoms = new JPanel();
@@ -931,11 +964,21 @@ public class TSC40MajorPanel extends  MHPanel implements ActionListener{
 	}
 	
 	private void save(){
-		TSC40Obj tsc40Obj = new TSC40Obj();
+		TSC40Obj tsc40Obj;
+		
+		if (bEditMode){
+			tsc40Obj = this.tsc40Obj;
+		}else{
+			tsc40Obj = new TSC40Obj();
+		}
+
 		tsc40Obj.setCaseId(cnslee.getCaseNumber());
 
 		tsc40Obj.setChkListDate(valTestDate.getDate());
-		tsc40Obj.setChkListTotalScore(txtTotalScore.getText());
+		tsc40Obj.setChkListDesc(txtTestDesc.getText());
+//		tsc40Obj.setChkListCounsellor(cnslee.) //TODO - WE need a mechanism to get current counsellor name
+		
+		tsc40Obj.setChkListTotalScore(String.valueOf(findTotalScore()));
 		tsc40Obj.setHeadAche(cbHeadAche.getScore());
 		tsc40Obj.setInsomnia(cbInsomnia.getScore());
 		tsc40Obj.setWghtLoss(cbWghtLoss.getScore());
@@ -977,13 +1020,23 @@ public class TSC40MajorPanel extends  MHPanel implements ActionListener{
 		tsc40Obj.setBreatheTrouble(cbBreatheTrouble.getScore());
 		tsc40Obj.setSxFeelingUntimely(cbSxFeelingUntimely.getScore());
 		
-		//save it to the server
-		if (ACEConnector.getInstance().saveTSC40CheckLst(tsc40Obj)){
-			parent.addSymptChkLists(tsc40Obj);
-		}else{
-			JOptionPane.showMessageDialog(this, "Error saving TSC 40 details to server","Error", JOptionPane.ERROR_MESSAGE);
-		}
 		
+		//save it to the server
+		if (bEditMode){
+			if (ACEConnector.getInstance().updateTSC40CheckLst(tsc40Obj)){
+				parent.updateSymptChkLists(tsc40Obj);
+			}else{
+				JOptionPane.showMessageDialog(this, "Error updating TSC 40 details to server","Error", JOptionPane.ERROR_MESSAGE);
+			}
+			
+		}else{
+
+			if (ACEConnector.getInstance().saveTSC40CheckLst(tsc40Obj)){
+				parent.addSymptChkLists(tsc40Obj);
+			}else{
+				JOptionPane.showMessageDialog(this, "Error saving TSC 40 details to server","Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}		
 		
 	}
 	
@@ -1064,6 +1117,63 @@ public class TSC40MajorPanel extends  MHPanel implements ActionListener{
 		
 		
 	}
+	
+	private void setEditValues(){
+		
+		try{
+			
+			valTestDate.setDate(tsc40Obj.getChkListDate());
+			cnsleName.setText(tsc40Obj.getCaseId());
+			txtTestDesc.setText(tsc40Obj.getChkListDesc());
+
+			cbHeadAche.setSelectedIndex(tsc40Obj.getHeadAche());
+			cbInsomnia.setSelectedIndex(tsc40Obj.getInsomnia());
+			cbWghtLoss.setSelectedIndex(tsc40Obj.getWghtLoss());
+			cbStomachProb.setSelectedIndex(tsc40Obj.getStomachProb());
+			cbSexProb.setSelectedIndex(tsc40Obj.getSexProb());
+			cbIsolation.setSelectedIndex(tsc40Obj.getIsolation()); 
+			cbFlashBack.setSelectedIndex(tsc40Obj.getFlashBack());
+			cbRestlssSleep.setSelectedIndex(tsc40Obj.getRestlssSleep());
+			cbLowSxDrive.setSelectedIndex(tsc40Obj.getLowSxDrive());
+			cbLoneliness.setSelectedIndex(tsc40Obj.getLoneliness());
+			cbNightmares.setSelectedIndex(tsc40Obj.getNightmares());
+			cbSpaceOut.setSelectedIndex(tsc40Obj.getSpaceOut());
+			cbAnxAttck.setSelectedIndex(tsc40Obj.getAnxAttck());
+			cbSadness.setSelectedIndex(tsc40Obj.getSadness());
+			cbDizziness.setSelectedIndex(tsc40Obj.getDizziness());
+			cbDissatSxDrive.setSelectedIndex(tsc40Obj.getDissatSxDrive());
+			cbCtrlTemper.setSelectedIndex(tsc40Obj.getCtrlTemper());
+			cbWakeEarly.setSelectedIndex(tsc40Obj.getWakeEarly());
+			cbSxOveract.setSelectedIndex(tsc40Obj.getSxOveract());
+			cbUncontrolCry.setSelectedIndex(tsc40Obj.getUncontrolCry());
+			cbFearMen.setSelectedIndex(tsc40Obj.getFearMen());
+			cbNotRestMorn.setSelectedIndex(tsc40Obj.getNotRestMorn());
+			cbSxNoEnjoy.setSelectedIndex(tsc40Obj.getSxNoEnjoy());
+			cbTrblGetAlong.setSelectedIndex(tsc40Obj.getTrblGetAlong());
+			cbMemProb.setSelectedIndex(tsc40Obj.getMemProb());
+			cbPhysicHurt.setSelectedIndex(tsc40Obj.getPhysicHurt());
+			cbFearWomen.setSelectedIndex(tsc40Obj.getFearWomen());
+			cbWakeMidnight.setSelectedIndex(tsc40Obj.getWakeMidnight());
+			cbBadThoughtsSx.setSelectedIndex(tsc40Obj.getBadThoughtsSx()); 
+			cbPassOut.setSelectedIndex(tsc40Obj.getPassOut());
+			cbUnrealFeel.setSelectedIndex(tsc40Obj.getUnrealFeel());
+			cbFreqWash.setSelectedIndex(tsc40Obj.getFreqWash());
+			cbInferiority.setSelectedIndex(tsc40Obj.getInferiority());
+			cbTension.setSelectedIndex(tsc40Obj.getTension());
+			cbSxConfusion.setSelectedIndex(tsc40Obj.getSxConfusion());
+			cbHurtOthers.setSelectedIndex(tsc40Obj.getHurtOthers());
+			cbGuilt.setSelectedIndex(tsc40Obj.getGuilt());
+			cbFeelNotInBody.setSelectedIndex(tsc40Obj.getFeelNotInBody());
+			cbBreatheTrouble.setSelectedIndex(tsc40Obj.getBreatheTrouble());
+			cbSxFeelingUntimely.setSelectedIndex(tsc40Obj.getSxFeelingUntimely());
+			
+		}catch(Exception e){
+			
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Error setting values to be edited","Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 
 	@Override
 	public void setMHPanelObserver(MHPanelObserver obs) {

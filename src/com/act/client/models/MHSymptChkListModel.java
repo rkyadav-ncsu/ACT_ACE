@@ -11,7 +11,7 @@ public class MHSymptChkListModel extends AbstractTableModel{
 
 	String [] columns = new String[] {"Date" ,
 							"Check List Type",
-							"Check List Name",
+							"Description",
 							"Counsellor",
 							"Total Score"};
 							
@@ -28,8 +28,9 @@ public class MHSymptChkListModel extends AbstractTableModel{
 //		System.out.println(vSymptChkLists.size());
 		fireTableDataChanged();
 		//fireTableStructureChanged();
-		fireTableRowsInserted(0, 2);
-		
+//		fireTableRowsInserted(0, 2);
+		System.out.println("sympt chk list setList  ");
+
 	}
 	
 	public Object getValueAt(int rowIndex, int columnIndex) {
@@ -39,6 +40,7 @@ public class MHSymptChkListModel extends AbstractTableModel{
 			MHSymptChkListObj chkListObj= vSymptChkLists.get(rowIndex);
 			
 			if (chkListObj == null){
+				System.out.println("sympt chk list 1");
 				return value;
 			}
 		
@@ -46,12 +48,11 @@ public class MHSymptChkListModel extends AbstractTableModel{
 			switch (columnIndex) {
 			
 				case 0:
-			
 					return chkListObj.getChkListDate();
 				case 1:
 					return chkListObj.getChkListType();
 				case 2:
-					return chkListObj.getChkListId();
+					return chkListObj.getChkListDesc();
 				case 3:
 					return chkListObj.getChkListCounsellor();
 				case 4:
@@ -111,6 +112,15 @@ public class MHSymptChkListModel extends AbstractTableModel{
 	
 	public void addRow(MHSymptChkListObj obj){
 		vSymptChkLists.add(obj);
+		fireTableDataChanged();
+	}
+
+	public void removeRow(MHSymptChkListObj obj){
+		vSymptChkLists.remove(obj);
+		fireTableDataChanged();
+	}
+	
+	public void updateRow(MHSymptChkListObj obj){
 		fireTableDataChanged();
 	}
 

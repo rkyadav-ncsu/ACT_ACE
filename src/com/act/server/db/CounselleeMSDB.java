@@ -1,5 +1,8 @@
 package com.act.server.db;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +15,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
 import java.util.Vector;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.act.client.CnsleeSymptChkListsPanel;
 import com.act.common.ACEDefines;
@@ -50,9 +55,11 @@ public class CounselleeMSDB extends CounselleeDB{
 		
 		return counselleeMSDB;
 	}
-	
-	public Vector<Counsellee> getList(Hashtable<String, String> htOptions){
-		Connection con = null; 
+
+
+	public Vector<Counsellee> getCounsleeList(String CnslrId, Hashtable<String, String> htOptions){
+		Connection con = null;
+		
 		Vector<Counsellee> vCounsellee = new Vector<Counsellee>();
 		
 		String sql= "Select * from " +
@@ -79,8 +86,8 @@ public class CounselleeMSDB extends CounselleeDB{
 				
 				sbWhere.append(likeClause(DB_COL_INDIV_CNSLR_NAME, val));
 			}
-			if (htOptions.containsKey(ACEDefines.COUNSELLE_PARENT_ORG)){
-				String val = htOptions.get(ACEDefines.COUNSELLE_PARENT_ORG);
+			if (htOptions.containsKey(ACEDefines.COUNSELLE_ORGANIZATION)){
+				String val = htOptions.get(ACEDefines.COUNSELLE_ORGANIZATION);
 				
 				if (sbWhere.length() <1)
 					sbWhere.append(" Where ");
@@ -100,6 +107,19 @@ public class CounselleeMSDB extends CounselleeDB{
 				sbWhere.append(likeClause(DB_COL_INDIV_OTHER_NAME,  val));
 			}
 		}
+
+		//Authenticate the user   //TODO
+		//1. if cnslrId is ADMIN, no need of condition,
+		//2. else show only that user's counsellee details
+		if (!UserMSDB.getInstance().isAdmin(CnslrId)){
+			if (sbWhere.length() <1)
+				sbWhere.append(" Where ");
+			else
+				sbWhere.append(" And ");
+			
+			sbWhere.append(DB_COL_INDIV_CNSLR_NAME + " = '"+  CnslrId +"'");
+		}		
+
 		
 		if (sbWhere.length() > 0){
 			sql +=sbWhere.toString();
@@ -119,9 +139,13 @@ public class CounselleeMSDB extends CounselleeDB{
 				counselee.setCaseNumber(rs.getString(DB_COL_INDIV_ID));
 				counselee.setName(new PersonName(rs.getString(DB_COL_INDIV_NAME)));
 				counselee.setParentOrg(rs.getString(DB_COL_INDIV_PARTNER_ORGN));
-//				counselee.setCaseNumber(rs.getString(DB_COL_INDIV_ID));
 				counselee.setDate(rs.getString(DB_COL_INDIV_DATE_ASSESSMENT));
-				
+				counselee.setDob(rs.getString(DB_COL_INDIV_DOB));
+				counselee.setDtTerm(rs.getString(DB_COL_INDIV_DTTERM));
+				counselee.setGender(rs.getString(DB_COL_INDIV_GENDER));
+				counselee.setLocation(rs.getString(DB_COL_INDIV_HOME));
+				counselee.setOtherName(rs.getString(DB_COL_INDIV_OTHER_NAME));
+
 				vCounsellee.add(counselee);
 				
 			}
@@ -321,13 +345,11 @@ public class CounselleeMSDB extends CounselleeDB{
 		try{
 			con = getConnection();
 			
+			//generate counsellee ID
+			strCnsl_ID = generateCounselleeId(cnslee);
 			
 			//create the insert query statement values
 			sql.append(" values (");
-			Date date = new Date();
-			DateFormat dtformat = new SimpleDateFormat("yyyymmdd");								// ND edited on 1st Dec
-			strCnsl_ID =cnslee.getParentOrg().substring(0,3) +									// ND edited on 1st Dec
-							dtformat.format(date) +ran.nextInt(3);								
 			cnslee.setCaseNumber(strCnsl_ID);													// ND edited on 1st Dec 
 			cnslHist.setCounseleeID(strCnsl_ID);
 			sql.append("'" + strCnsl_ID + "'");					
@@ -338,9 +360,19 @@ public class CounselleeMSDB extends CounselleeDB{
 			sql.append(",");
 			sql.append("'" +cnslee.getDate() +"'");
 			sql.append(",");
+			sql.append("'" + cnslee.getAge() + "'");
+			sql.append(",");
 			sql.append("'" +cnslee.getName().toString() +"'");
 			sql.append(",");
 			sql.append("'Marie DSouza'"); //TODO change to actual value
+			sql.append(",");
+			sql.append("'" + cnslee.getLocation()+ "'");								// ND added on 2nd Apr 16
+			sql.append(",");
+			sql.append("'" + cnslee.getDob() + "'");											//  ND added on 2nd Apr 16
+			sql.append(",");
+			sql.append("'" + cnslee.getDtTerm() + "'");											//  ND added on 2nd Apr 16
+			sql.append(",");
+			sql.append("'" + cnslee.getGender() + "'");											// ND added 02nd Apr 16
 			sql.append(" )");
 			
 			System.out.println("insert query string : " + sql.toString());
@@ -374,6 +406,15 @@ public class CounselleeMSDB extends CounselleeDB{
 		}
 		
 		return "ERROR";
+	}
+
+	private String generateCounselleeId(Counsellee cnslee) {
+		String strCnsl_ID;
+		Date date = new Date();
+		DateFormat dtformat = new SimpleDateFormat("yyyymmdd");								// ND edited on 1st Dec
+		strCnsl_ID =cnslee.getParentOrg().substring(0,3) +									// ND edited on 1st Dec
+						dtformat.format(date) +ran.nextInt(3);
+		return strCnsl_ID;
 	}
 	
 	// ND added on 27th Oct
@@ -611,7 +652,9 @@ public class CounselleeMSDB extends CounselleeDB{
 				st.executeBatch();
 				st.close();
 				con.close();
-				return "SUCCESS in SQL batch updating details of counselee"; //TODO CONVERT TOdefines
+//				return "SUCCESS in SQL batch updating details of counselee"; //TODO CONVERT TOdefines
+				return "SUCCESS in SQL batch inserting new records for a new counselee"; //TODO CONVERT TOdefines				// ND added 5th Apr 16
+
 			}catch(SQLException e){
 				e.printStackTrace();
 				if (con != null)
@@ -642,45 +685,81 @@ public class CounselleeMSDB extends CounselleeDB{
 
 	public String  updateCounselee(Counsellee cnslee){				
 		Connection con = null; 
-		String strCnsl_ID;
+		String strCnsl_ID, strOld_ID, strOld_parent;
 		// UPDATE tablename SET Col1 = val1, Col2 = val2, .... WHERE INDIV_ID =  strCnsl_ID
 		StringBuffer sql= new StringBuffer("UPDATE " +
 					DB_TBL_INDIV + " SET ");
 
 		try{
 			con = getConnection();
-
-			strCnsl_ID = cnslee.getCaseNumber();
+			Statement st = con.createStatement();																// ND added 11th Apr 16
+			strOld_ID = cnslee.getCaseNumber();
 			
-			sql.append(DB_COL_INDIV_ID);
-			sql.append("'" + strCnsl_ID + "'");					
-			sql.append(",");
-			sql.append(DB_COL_INDIV_PARTNER_ORGN);
-			sql.append("'" +cnslee.getParentOrg() +"'");
-			sql.append(",");
-			sql.append(DB_COL_INDIV_OTHER_NAME);
-			sql.append("'"  +cnslee.getOtherName() +"'");
-			sql.append(",");
-			sql.append(DB_COL_INDIV_DATE_ASSESSMENT);
-			sql.append("'" +cnslee.getDate() +"'");
-			sql.append(",");
-			sql.append(DB_COL_INDIV_NAME);
-			sql.append("'" +cnslee.getName().toString() +"'");
-			sql.append(",");
-			sql.append(DB_COL_INDIV_CNSLR_NAME);
-			sql.append("Marie DSouza"); //TODO change to actual value
-			sql.append(" WHERE ");
-			sql.append(DB_COL_INDIV_ID);
-			sql.append(" = ");
-			sql.append(strCnsl_ID);
-			sql.append(" )");
-			
-			System.out.println("update Details query string : " + sql.toString());
-			
-			
-			Statement st = con.createStatement();
-			int n = st.executeUpdate(sql.toString());
-			
+			System.out.println(DB_COL_INDIV_ID + " " + strOld_ID + " * * * * * * * * * * * * * * * * * *");
+			String sql_old = getSelectQuery(DB_TBL_INDIV, DB_COL_INDIV_ID, strOld_ID);							// ND added 06th Apr 16
+			System.out.println(sql_old);
+			ResultSet rs_cnslee ;
+			strOld_parent = null;
+			rs_cnslee = st.executeQuery(sql_old);																// ND added 06th Apr 16
+			while (rs_cnslee.next()){
+				strOld_parent = rs_cnslee.getString(DB_COL_INDIV_PARTNER_ORGN) ;										// ND added 06th Apr 16
+				System.out.println("Parent orgn old: " + rs_cnslee.getString(DB_COL_INDIV_NAME) + " ------------------------------");
+			}
+				if (strOld_parent != cnslee.getParentOrg()) {											// ND added 05th Apr 16
+					strCnsl_ID = generateCounselleeId(cnslee);		
+					System.out.println("Parent orgn has been changed " + strCnsl_ID);
+				}
+//				else
+					strCnsl_ID = cnslee.getCaseNumber();
+				
+	//			cnslee.setCaseNumber(strCnsl_ID);													// ND added 05th Apr 16
+	
+				
+				// "= '" ND added for all the columns on 5th Apr 16
+				sql.append(DB_COL_INDIV_ID);
+				sql.append("= '" + strCnsl_ID + "'");					
+				sql.append(",");
+				sql.append(DB_COL_INDIV_PARTNER_ORGN);
+				sql.append("= '" +cnslee.getParentOrg() +"'");
+				sql.append(",");
+				sql.append(DB_COL_INDIV_HOME);											//ND added 05th Apr 16
+				sql.append("= '" + cnslee.getLocation() + "'");
+				sql.append(",");
+				sql.append(DB_COL_INDIV_OTHER_NAME);
+				sql.append("= '"  +cnslee.getOtherName() +"'");
+				sql.append(",");
+				sql.append(DB_COL_INDIV_DATE_ASSESSMENT);
+				sql.append("= '" +cnslee.getDate() +"'");
+				sql.append(",");
+				sql.append(DB_COL_INDIV_DOB);											// ND added 14th Apr 16
+				sql.append("= '" +cnslee.getDob() +"'");
+				sql.append(",");
+				sql.append(DB_COL_INDIV_AGE);											// ND added 05th Apr 16
+				sql.append("= '" + cnslee.getAge() + "'");
+				sql.append(",");
+				sql.append(DB_COL_INDIV_NAME);
+				sql.append("= '" +cnslee.getName().toString() +"'");
+				sql.append(",");
+				sql.append(DB_COL_INDIV_CNSLR_NAME);
+				sql.append("= 'Marie DSouza'"); //TODO change to actual value1
+				sql.append(",");
+				sql.append(DB_COL_INDIV_DTTERM);										// ND added 05th Apr 16
+				sql.append("= '" + cnslee.getDtTerm() + "'");
+				sql.append(",");
+				sql.append(DB_COL_INDIV_GENDER);										// ND added 05th Apr 16
+				sql.append("= '" + cnslee.getGender() + "'");
+				sql.append(" WHERE ");
+				sql.append(DB_COL_INDIV_ID);
+				sql.append(" = '");
+				sql.append(strOld_ID + "'");											// ND edited 05th Apr 16
+				
+				System.out.println("update Counselee info query string : " + sql.toString());
+				if (strOld_ID != strCnsl_ID){											// ND added 09th Apr 16
+					changeIndivID_all(strOld_ID, strCnsl_ID);
+				}
+				
+	//			Statement st = con.createStatement();								// ND commented 11th Apr 16
+				int n = st.executeUpdate(sql.toString());
 			con.close();
 			
 			return "SUCCESS"; //TODO CONVERT TOdefines
@@ -815,6 +894,7 @@ public class CounselleeMSDB extends CounselleeDB{
 			sql.append(strCnsl_ID + "'");
 			
 			System.out.println("update Education history query string : " + sql.toString());
+			System.out.println("*********" + joinVStrings(eduHist.getEduNonForm()) + " ********");
 			
 			
 			Statement st = con.createStatement();
@@ -919,14 +999,13 @@ public class CounselleeMSDB extends CounselleeDB{
 // start ND added 12th Mar 16
 	// Delete the old records of the relatives (after having traferred data 
 	//  to the Intake form and then save the new data from the form	
-	public String  updateCnslReln(Vector<CounseleeRelativeIndivObj> vCnslReln){				
+	public String  updateCnslReln(Vector<CounseleeRelativeIndivObj> vCnslReln, String caseNum){				// ND edited 02nd May 16
 		Connection con = null; 
 		String strCnsl_ID = null;
+		CounseleeRelativeIndivObj relObjF = null;											// ND added 02nd May 16
 			
 //		StringBuffer sql= new StringBuffer("UPDATE " +
 //					DB_TBL_CNSLRELN + " SET ");
-		StringBuffer sql_del_fReln = new StringBuffer("Delete from " + DB_TBL_CNSLRELN + 
-				" where " + DB_COL_CNSLRELN_INDIV_ID + " = ' " + strCnsl_ID + ";" );
 
 		String[] sql_cnslReln = new String[10];
 		try{
@@ -934,11 +1013,19 @@ public class CounselleeMSDB extends CounselleeDB{
 			Statement stdel = con.createStatement();
 			Statement st = con.createStatement();
 			
-			CounseleeRelativeIndivObj relObjF = (CounseleeRelativeIndivObj) vCnslReln.elementAt(0);
-			strCnsl_ID = relObjF.getCaseNumber();
+			if (vCnslReln != null){																// ND added 02nd May 16
+				 relObjF = (CounseleeRelativeIndivObj) vCnslReln.elementAt(0);					// 	ND edited 02nd May 16
+				 strCnsl_ID = relObjF.getCaseNumber();
+			}
+			else																				// ND added 02nd May 16
+				strCnsl_ID = caseNum;															// ND added 02nd May 16 
+			StringBuffer sql_del_fReln = new StringBuffer("Delete from " + DB_TBL_CNSLRELN + 
+					" where " + DB_COL_CNSLRELN_INDIV_ID + " = '" + strCnsl_ID + "'" );				// ND edited 19th Apr 16
+
+			System.out.println( strCnsl_ID + " ****************** " + sql_del_fReln.toString() );
 			if (strCnsl_ID != null) {
 				int nd = stdel.executeUpdate(sql_del_fReln.toString());
-				System.out.println(nd + " relative records deleted");
+				System.out.println(nd + " relative records deleted ");
 			}
 			stdel.close();
 
@@ -956,46 +1043,19 @@ public class CounselleeMSDB extends CounselleeDB{
 					sql_cnslReln[i] = createInsertQry( colNamesCnslReln, colValCnslReln);
 					sql_cnslReln[i] = "Insert into " + DB_TBL_CNSLRELN + sql_cnslReln[i];
 				}
+				for (int i=0; i<sql_cnslReln.length; i++)							// ND added 26th Apr 16
+					st.addBatch(sql_cnslReln[i]);
+				st.executeBatch();
+
 			}
 
-			for (int i=0; i<sql_cnslReln.length; i++)
-				st.addBatch(sql_cnslReln[i]);
-			st.executeBatch();
+//			for (int i=0; i<sql_cnslReln.length; i++)								// ND commented 26th Apr 16
+//				st.addBatch(sql_cnslReln[i]);
+//			st.executeBatch();
+			
 			st.close();
 // end ND added 12th Mar 16	
 			
-//			sql.append(DB_COL_CNSLRELN_RELNNAME);
-//			sql.append("'" + abuseHist.getAbuseVerbal() +"'");
-//			sql.append(",");
-//			sql.append(DB_COL_CNSLRELN_RELNSTRENGTH);
-//			sql.append("'"  + abuseHist.getAbusePhys() +"'");
-//			sql.append(",");
-//			sql.append(DB_COL_CNSLRELN_RELNAGE);
-//			sql.append("'" + abuseHist.getAbuseSex() +"'");
-//			sql.append(",");
-//			sql.append(DB_COL_CNSLRELN_RELNAWARE);
-//			sql.append("'" + abuseHist.getAbuseNeglect() +"'");
-//			sql.append(",");
-//			sql.append(DB_COL_CNSLRELN_RELNCOMMENTS);
-//			sql.append("'" + abuseHist.getAbuseComments() + ";");
-//			sql.append(",");
-//			sql.append(DB_COL_CNSLRELN_RELATIONSHIP);
-//			sql.append("'" + abuseHist.getAbuseVerbal() +"'");
-//			sql.append(",");
-//			sql.append(DB_COL_CNSLRELN_RELNPROFESSION);
-//			sql.append("'"  + abuseHist.getAbusePhys() +"'");
-//			sql.append(" WHERE ");
-//			sql.append(DB_COL_CNSLRELN_INDIV_ID);
-//			sql.append(" = ");
-//			sql.append(strCnsl_ID);
-//			sql.append(" )");
-//			
-//			System.out.println("update Abuse history query string : " + sql.toString());
-//			
-//			
-//			Statement st = con.createStatement();
-//			int n = st.executeUpdate(sql.toString());
-//			
 			con.close();
 			
 			return "SUCCESS"; //TODO CONVERT TOdefines
@@ -1560,6 +1620,10 @@ public class CounselleeMSDB extends CounselleeDB{
 
 // end ND edited on 4th Feb 16
 // end ND added 25th Jan 16
+	
+
+	// End of Update the tables procedure Beginning of reading info from the tables for Update procedure					// ND added 5th Apr 16
+	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
 
 // start ND added 15th Feb 16 till Mar 16
 	// to read the contents of the database into the Intake form.
@@ -1569,6 +1633,7 @@ public class CounselleeMSDB extends CounselleeDB{
 		String strCnsl_ID = caseNum;
 		String col_name = new String();
 		
+//		Counsellee cnsleeObj = new Counsellee();									// ND added 5th Apr 16
 		AbuseIndivObj abuHistObj = new AbuseIndivObj();
 		EducationHistIndivObj eduObj = new EducationHistIndivObj();
 		Vector vCnslRelnObj = new Vector<CounseleeRelativeIndivObj>();	
@@ -1582,6 +1647,7 @@ public class CounselleeMSDB extends CounselleeDB{
 //		LangFluency vocLangFl = new LangFluency();
 		LegalHistIndivObj legalHistObj = new LegalHistIndivObj();			
 
+//		String sql_cnslee = getSelectQuery(DB_TBL_INDIV, DB_COL_INDIV_ID, strCnsl_ID);							// ND added 5th Apr 16
 		String sql_abuHist =  getSelectQuery(DB_TBL_ABUSEHIST, DB_COL_ABUSEHIST_INDIV_ID, strCnsl_ID);
 		String sql_eduHist = getSelectQuery( DB_TBL_EDUHIST, DB_COL_EDUHIST_INDIV_ID , strCnsl_ID);
 		String sql_fEnv = getSelectQuery( DB_TBL_FAMENV, DB_COL_FAMENV_INDIV_ID , strCnsl_ID);
@@ -1600,6 +1666,26 @@ public class CounselleeMSDB extends CounselleeDB{
 			con = getConnection();
 			Statement st = con.createStatement();
 
+// start ND added 5th Apr 16
+//			ResultSet rsCnslee = st.executeQuery(sql_cnslee);
+//			while (rsCnslee.next()){
+//				System.out.println("Counslee's main info being read");
+//				cnsleeObj.setAge(rsCnslee.getInt(DB_COL_INDIV_AGE));
+////				cnsleeObj.setCaseNumber(rsCnslee.getString(DB_COL_INDIV_ID));
+//				cnsleeObj.setDate(rsCnslee.getString(DB_COL_INDIV_DATE_ASSESSMENT));
+//				cnsleeObj.setDob(rsCnslee.getString(DB_COL_INDIV_DOB));
+//				cnsleeObj.setDtTerm(rsCnslee.getString(DB_COL_INDIV_DTTERM));
+//				cnsleeObj.setGender(rsCnslee.getString(DB_COL_INDIV_GENDER));
+//				cnsleeObj.setLocation(rsCnslee.getString(DB_COL_INDIV_HOME));
+//// 				cnsleeObj.setName(rsCnslee.getString(DB_COL_INDIV_NAME));
+//				cnsleeObj.setOtherName(rsCnslee.getString(DB_COL_INDIV_OTHER_NAME));
+//				cnsleeObj.setParentOrg(rsCnslee.getString(DB_COL_INDIV_PARTNER_ORGN));
+//				System.out.println("Termination, Partner Orgn, Home, Age: " + rsCnslee.getString(DB_COL_INDIV_DTTERM)
+//						+ ", " + rsCnslee.getString(DB_COL_INDIV_PARTNER_ORGN) + ", " + rsCnslee.getString(DB_COL_INDIV_HOME)
+//						+ ", " + rsCnslee.getString(DB_COL_INDIV_AGE));
+//				cnslHist.setCounseleeObj(cnsleeObj);
+//			}
+//// end ND added 5th Apr 16
 			ResultSet rsAbu = st.executeQuery(sql_abuHist); 
 			while (rsAbu.next()){											
 				System.out.println("Abuse info being read");
@@ -1612,7 +1698,8 @@ public class CounselleeMSDB extends CounselleeDB{
 				cnslHist.setabuseIndivObj(abuHistObj);
 			}
 			ResultSet rsEdu = st.executeQuery(sql_eduHist);
-			while (rsEdu.next()) {
+			while (rsEdu.next()){
+				System.out.println("&&&&&&&&&&&&&&&&&& Result set Education: " + rsEdu.getString(DB_COL_EDUHIST_EDCOMMENTS) + " ***************** ");
 				eduObj.setEduAttend(rsEdu.getBoolean(DB_COL_EDUHIST_ATTENDEDSCHOOL));
 				eduObj.setEduComm(rsEdu.getString(DB_COL_EDUHIST_EDCOMMENTS));
 				eduObj.setEduCont(rsEdu.getBoolean(DB_COL_EDUHIST_CONTINUESTUDIES));
@@ -1620,6 +1707,7 @@ public class CounselleeMSDB extends CounselleeDB{
 				eduObj.setEduSchExp(rsEdu.getString(DB_COL_EDUHIST_SCHOOLEXPERIENCE));
 				eduObj.setEduStd(rsEdu.getString(DB_COL_EDUHIST_HIGHSTD));
 				eduObj.setEduWhere(rsEdu.getString(DB_COL_EDUHIST_WHEREED));
+				System.out.println("Educated? " + rsEdu.getBoolean(DB_COL_EDUHIST_ATTENDEDSCHOOL));
 				String sNFEd = null;
 				sNFEd = rsEdu.getString(DB_COL_EDUHIST_NON_FORMALED);
 				if (sNFEd != null){
@@ -1628,6 +1716,7 @@ public class CounselleeMSDB extends CounselleeDB{
 				}
 				else
 					System.out.println("sNFEd is null - did not read non-formal education from table for editing");
+					
 	//			eduObj.setLstEduNonForm(rsEdu.getString(DB_COL_EDUHIST_NON_FORMALED));
 	
 				cnslHist.seteduIndivObj(eduObj);
@@ -1651,23 +1740,27 @@ public class CounselleeMSDB extends CounselleeDB{
 //			System.out.println("did not read Family Env from table for editing");
 			
 			// ND added 12th Mar 16
-//			ResultSet rsReln = st.executeQuery(sql_cnslReln);
-//			int r = 0;
+			// ND uncommented on 11th Apr 16
+			ResultSet rsReln = st.executeQuery(sql_cnslReln);
+			int r = 0;
 //			CounseleeRelativeIndivObj reln = (CounseleeRelativeIndivObj) vCnslRelnObj.elementAt(r);
-//			System.out.println("Just read Relative History");
-//			while (rsReln.next()) {
-//				reln.setRelAge(rsReln.getString(DB_COL_CNSLRELN_RELNAGE));
-//				reln.setRelationship(rsReln.getString(DB_COL_CNSLRELN_RELATIONSHIP));
-//				reln.setCaseNumber(rsReln.getString(DB_COL_CNSLRELN_INDIV_ID));
-//				reln.setRelAwareOfVictimsSituation(rsReln.getBoolean(DB_COL_CNSLRELN_RELNAWARE));
-//				reln.setRelComments(rsReln.getString(DB_COL_CNSLRELN_RELNCOMMENTS));
-//				reln.setRelName(rsReln.getString(DB_COL_CNSLRELN_RELNNAME));
-//				System.out.println(reln.getRelName());
-//				reln.setRelProfession(rsReln.getString(DB_COL_CNSLRELN_RELNPROFESSION));
-//				reln.setRelStrength(rsReln.getString(DB_COL_CNSLRELN_RELNSTRENGTH));
-//				vCnslRelnObj.add(reln);
-//				System.out.println("Just transferring Relative History");
-//			}
+			CounseleeRelativeIndivObj reln =  new CounseleeRelativeIndivObj();
+			System.out.println("Just read Relative History");
+			while (rsReln.next()) {
+				reln = new CounseleeRelativeIndivObj();											// ND added 11th Apr 16
+				reln.setRelAge(rsReln.getString(DB_COL_CNSLRELN_RELNAGE));
+				reln.setRelationship(rsReln.getString(DB_COL_CNSLRELN_RELATIONSHIP));
+				reln.setCaseNumber(rsReln.getString(DB_COL_CNSLRELN_INDIV_ID));
+				reln.setRelAwareOfVictimsSituation(rsReln.getBoolean(DB_COL_CNSLRELN_RELNAWARE));
+				reln.setRelComments(rsReln.getString(DB_COL_CNSLRELN_RELNCOMMENTS));
+				reln.setRelName(rsReln.getString(DB_COL_CNSLRELN_RELNNAME));
+				System.out.println(reln.getRelName());
+				reln.setRelProfession(rsReln.getString(DB_COL_CNSLRELN_RELNPROFESSION));
+				reln.setRelStrength(rsReln.getString(DB_COL_CNSLRELN_RELNSTRENGTH));
+				vCnslRelnObj.add(reln);
+				System.out.println("Just transferring Relative History");
+			}
+			cnslHist.setvCnslRelnObj(vCnslRelnObj);												// ND added on 11th Apr 16
 			
 			ResultSet rsPhy = st.executeQuery(sql_phyHist);
 			System.out.println("Just read Physical History");
@@ -1885,81 +1978,67 @@ public class CounselleeMSDB extends CounselleeDB{
 		sql = sql + sql_cond;
 	    return sql;
 	}
-
 // end ND added 15th Feb 16
-	
-//	// Copied to DB.java
-//	// start ND added 25th Mar 16
-//	public static Hashtable<String, String> transferLangToHash(String sRead, String sWrite, String sSpeak) {
-//		// TODO Auto-generated method stub
-//		Hashtable <String, String> htLangUse = new Hashtable<String, String>();
-//		Vector vRead, vWrite, vSpeak, vLangKnown;
-//		String sLangKnown = new String();
-//		
-//		vRead = DB.stringToVector(sRead);
-//		vWrite = DB.stringToVector(sWrite);
-//		vSpeak = DB.stringToVector(sSpeak);
-//		
-//		for (int l=0; l < 3; l++){
-//			switch (l) {
-//			case 0: vLangKnown = vSpeak;
-//					break;
-//			case 1: vLangKnown = vRead;
-//					break;
-//			case 2: vLangKnown = vWrite;
-//					break;
-//			default: vLangKnown = null;
-//			}
-//			if(vLangKnown != null) {
-//				String sLangAbil = new String();
-//				String langToEnter = new String();
-//				for (int i = 0; i < vLangKnown.size(); i++) {
-//				String sLangInVector = vLangKnown.elementAt(i).toString();
-//				System.out.println(sLangInVector + " Number of langs:" + vLangKnown.size() + " - " + l);
-//				switch ( l) {
-//				case  0: 
-//					langToEnter = "Speak";
-//					htLangUse.put(sLangInVector, langToEnter);			// all the languages in the Speak field will be added to the hash table
-//					break;															// one after the other : case 0
-//				case 1:
-//					if (!htLangUse.containsKey(sLangInVector)){
-//						langToEnter = "Read";
-//						htLangUse.put(sLangInVector, langToEnter);
-//					}
-//					else {
-//						langToEnter = "Speak, Read";
-//						htLangUse.put(sLangInVector, langToEnter);
-//					}
-//					break;
-//				case 2:
-//					if (!htLangUse.containsKey(sLangInVector)) {
-//						htLangUse.put(sLangInVector, "Write");
-//					}
-//					else {
-//						sLangAbil = htLangUse.get(sLangInVector);
-//						sLangAbil = sLangAbil + ", Write";
-//						htLangUse.put(sLangInVector, sLangAbil);
-//					}
-//					break;
-//				default:
-//					System.out.println("No languagess known and none transferred into the hash table");
-//					break;
-//				}
-//			}
-//		}
-//	}
-//	if (htLangUse != null){
-//		String sKeyLangs = new String();
-//		sKeyLangs = htLangUse.keys().toString();
-//		System.out.println("The diff languages known are : " + sKeyLangs);
-//		return htLangUse;
-//	} 
-//	else 
-//		htLangUse.put("Error", "No Languages used");
-//	
-//	return htLangUse;
-//	}
-//	// end ND added 25th Mar 16	
 
+	
+// start ND added 09th Apr 16
+	public String changeIndivID_all(String old_ID, String new_ID){
+//	StringBuffer sql= new StringBuffer("UPDATE " +	DB_TBL_INDIV + " SET ");
+	Connection con = getConnection();
+
+	try{
+		Statement st = con.createStatement();
+	
+		st.addBatch("UPDATE " + DB_TBL_INDIV + " SET " + DB_COL_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_INDIV_ID + " = '" + old_ID + "'" );
+		st.addBatch("UPDATE " + DB_TBL_ABUSEHIST + " SET " + DB_COL_ABUSEHIST_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_ABUSEHIST_INDIV_ID + " = '" + old_ID + "'" );
+		
+		st.addBatch("UPDATE " + DB_TBL_CNSLRELN + " SET " + DB_COL_CNSLRELN_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_CNSLRELN_INDIV_ID + " = '" + old_ID + "'" );
+	
+		st.addBatch("UPDATE " + DB_TBL_FAMENV + " SET " + DB_COL_FAMENV_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_FAMENV_INDIV_ID + " = '" + old_ID + "'" );
+	
+		st.addBatch("UPDATE " + DB_TBL_EDUHIST + " SET " + DB_COL_EDUHIST_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_EDUHIST_INDIV_ID + " = '" + old_ID + "'" );
+		
+		st.addBatch("UPDATE " + DB_TBL_PHYSICALHIST + " SET " + DB_COL_PHYSICALHIST_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_PHYSICALHIST_INDIV_ID + " = '" + old_ID + "'" );
+		
+		st.addBatch("UPDATE " + DB_TBL_MENTALSTAT + " SET " + DB_COL_MENTALSTAT_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_MENTALSTAT_INDIV_ID + " = '" + old_ID + "'" );
+		
+		st.addBatch("UPDATE " + DB_TBL_VOCHIST + " SET " + DB_COL_VOCHIST_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_VOCHIST_INDIV_ID + " = '" + old_ID + "'" );
+	
+		st.addBatch("UPDATE " + DB_TBL_SOCIALHIST + " SET " + DB_COL_SOCHIST_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_SOCHIST_INDIV_ID + " = '" + old_ID + "'" );
+		
+		st.addBatch("UPDATE " + DB_TBL_CNSLSTRENGTH + " SET " + DB_COL_CNSLSTRENGTH_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_CNSLSTRENGTH_INDIV_ID + " = '" + old_ID + "'" );
+		
+		st.addBatch("UPDATE " + DB_TBL_CNSLSUMM + " SET " + DB_COL_CNSLSUMM_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_CNSLSTRENGTH_INDIV_ID + " = '" + old_ID + "'" );
+		
+		st.addBatch("UPDATE " + DB_TBL_LEGAL + " SET " + DB_COL_LEGAL_INDIV_ID + "= '" + new_ID + "' WHERE" 
+				+ DB_COL_LEGAL_INDIV_ID + " = '" + old_ID + "'" );
+		
+		st.executeBatch();
+		con.close();
+		}catch(SQLException e){
+			e.printStackTrace();
+			if (con != null)
+				try {
+					con.close();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		}
+		return "Error in updating all Indiv_IDs";
+	}
+
+	
 	
 }
