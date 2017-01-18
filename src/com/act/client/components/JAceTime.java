@@ -103,6 +103,7 @@ public class JAceTime extends JPanel{
 		
 		if (sTime == null || sTime.length() < 4)
 			return;
+		System.out.println("sTime" + sTime);
 		
 		cbAM.setSelectedItem("AM");
 		String sHrs = sTime.substring(0,2);
@@ -111,15 +112,17 @@ public class JAceTime extends JPanel{
 			hrs -= 12;
 			cbAM.setSelectedItem("PM");
 		}
+		sHrs = String.valueOf(hrs);
 		if (hrs <10)
 			sHrs = "0" + sHrs;
+		System.out.println("shrs" + sHrs);
 		cbHours.setSelectedItem(sHrs);
 		
 		String sMins = sTime.substring(2,4);
 		int mins = Integer.parseInt(sMins);
-		if (mins <10){
-			sMins = "0" + sMins;
-		}
+//		if (mins <10){
+//			sMins = "0" + sMins;
+//		}
 		cbMinutes.setSelectedItem(sMins);
 	}
 }

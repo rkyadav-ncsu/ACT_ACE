@@ -470,12 +470,12 @@ public class DB{
 	public static final String DB_COL_CNSLING_SESSION_DURATION			= "Duration";
 	public static final String DB_COL_CNSLING_SESSION_SETTING 			= "SessionSetting";
 	public static final String DB_COL_CNSLING_SESSION_OBJECTIVE 		= "SessionObjective";
-	public static final String DB_COL_CNSLING_SESSION_CONTENTS 			= "Contents/AreasConcern";
-	public static final String DB_COL_CNSLING_SESSION_CNSLR_COMMENTS 	= "CounselorComments";
-	public static final String DB_COL_CNSLING_SESSION_FOLLOW_UP_PREP 	= "FollowUpSessionPrep";
-	public static final String DB_COL_CNSLING_SESSION_THERAPY 			= "TherapyName";
-	public static final String DB_COL_CNSLING_SESSION_STATUS 			= "Status";
-	public static final String DB_COL_CNSLING_SESSION_CASE_MGMT 		= "CaseManagement";
+	public static final String DB_COL_CNSLING_SESSION_CONTENTS_AREAS_CONCERN	= "AreasOfConcern";
+	public static final String DB_COL_CNSLING_SESSION_CNSLR_COMMENTS 			= "CounselorComments";
+	public static final String DB_COL_CNSLING_SESSION_FOLLOW_UP_PREP 			= "FollowUpSessionPrep";
+	public static final String DB_COL_CNSLING_SESSION_THERAPY 					= "TherapyName";
+	public static final String DB_COL_CNSLING_SESSION_STATUS 					= "Status";
+	public static final String DB_COL_CNSLING_SESSION_CASE_MGMT 				= "CaseManagement";
 	public static final String DB_COL_CNSLING_SESSION_OPEN_TO_CNSLING 			= "OpenToCounseling";
 	public static final String DB_COL_CNSLING_SESSION_OPEN_TO_FUTURE_OUTSIDE 	= "OpenToFutureOutsideProst";
 	public static final String DB_COL_CNSLING_SESSION_OPEN_TO_GRP_HOME		 	= "OpentToGrpHome";
@@ -490,6 +490,17 @@ public class DB{
 	public static final String DB_COL_CNSLING_SESSION_ORIENTATION		 		= "Orientation";
 	public static final String DB_COL_CNSLING_SESSION_INSIGHT		 			= "Insight";
 	public static final String DB_COL_CNSLING_SESSION_JUDGEMENT		 			= "Judgement";
+	public static final String DB_COL_CNSLING_SESSION_APPETITE_COMMENTS		 			= "AppetiteComments";
+	public static final String DB_COL_CNSLING_SESSION_SLEEP_COMMENTS			 		= "SleepComments";
+	public static final String DB_COL_CNSLING_SESSION_RAPPORT_COMMENTS		 			= "RapportComments";
+	public static final String DB_COL_CNSLING_SESSION_APPEAR_COMMENTS		 			= "AppearanceComments";
+	public static final String DB_COL_CNSLING_SESSION_MOOD_COMMENTS		 				= "MoodComments";
+	public static final String DB_COL_CNSLING_SESSION_AFFECT_COMMENTS		 			= "AffectComments";
+	public static final String DB_COL_CNSLING_SESSION_THOUGHT_COMMENTS		 			= "ThoughtComments";
+	public static final String DB_COL_CNSLING_SESSION_DISTURBANCES_COMMENTS		 		= "DisturbancesComments";
+	public static final String DB_COL_CNSLING_SESSION_ORIENTATION_COMMENTS		 		= "OrientationComments";
+	public static final String DB_COL_CNSLING_SESSION_INSIGHT_COMMENTS		 			= "InsightComments";
+	public static final String DB_COL_CNSLING_SESSION_JUDGEMENT_COMMENTS		 		= "JudgementComments";
 
 	
 	/**

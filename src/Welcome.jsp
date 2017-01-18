@@ -17,7 +17,8 @@
 	<body>
          <center>
             <% String currentUser = (String )(session.getAttribute("LoginUser"));%>
-			<applet code=com.act.client.MainApplet.class width="1350" height="650" 
+			<applet code=com.act.client.MainApplet.class width="1350" height="700"
+			 
 			  archive= "AceApplet.jar">
 			  
 	           <param name="LoggedInUser"  value=<%= currentUser  %>/>

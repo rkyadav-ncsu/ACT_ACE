@@ -295,7 +295,7 @@ public class ReportsMSDB extends ReportsDB {
 				report.setSessionId(rs.getString(DB_COL_CNSLING_SESSION_ID));
 				report.setsSessionDate(rs.getString(DB_COL_CNSLING_SESSION_DATE));
 				report.setsDuration(rs.getString(DB_COL_CNSLING_SESSION_DURATION));
-				report.setsSessionContents(rs.getString(DB_COL_CNSLING_SESSION_CONTENTS));
+				report.setsSessionContents(rs.getString(DB_COL_CNSLING_SESSION_CONTENTS_AREAS_CONCERN));
 				report.setsNextObjectives(rs.getString(DB_COL_CNSLING_SESSION_FOLLOW_UP_PREP));
 				report.setsCaseManagement(rs.getString(DB_COL_CNSLING_SESSION_CASE_MGMT));
 				
