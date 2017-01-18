@@ -23,7 +23,6 @@ import com.act.common.Recreation;		// ND added 12th Oct
 import com.act.common.Organisation;		// ND added on 19th Oct
 import com.act.common.CareHome;			// ND added on 24th Oct
 import com.act.common.ServiceType;
-import com.sun.istack.internal.NotNull;
 
 public class GeneralMstMSDB extends GeneralMstDB {
 	private static GeneralMstMSDB generalMstMSDB;

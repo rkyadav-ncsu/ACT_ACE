@@ -27,7 +27,10 @@ public class CounsellingSessionObj implements Serializable{
 	
 	private String sAppetite, sSleep, sRapport, sAppearance,
 					sMood, sAffect, sThought, sPerceptDisturb,
-					sOrientation, sInsight, sJudgement;
+					sOrientation, sInsight, sJudgement,
+					sAppetiteComments, sSleepComments, sRapportComments, sAppearanceComments,
+					sMoodComments, sAffectComments, sThoughtComments, sPerceptDisturbComments,
+					sOrientationComments, sInsightComments, sJudgementComments;
 	
 	private String openToCnsling, opentTofutureOutsidePros, openTogrpHome;
 	
@@ -275,6 +278,94 @@ public class CounsellingSessionObj implements Serializable{
 
 	public void setCnslrComments(String cnslrComments) {
 		this.cnslrComments = cnslrComments;
+	}
+
+	public String getAppetiteComments() {
+		return sAppetiteComments;
+	}
+
+	public void setAppetiteComments(String sAppetiteComments) {
+		this.sAppetiteComments = sAppetiteComments;
+	}
+
+	public String getSleepComments() {
+		return sSleepComments;
+	}
+
+	public void setSleepComments(String sSleepComments) {
+		this.sSleepComments = sSleepComments;
+	}
+
+	public String getRapportComments() {
+		return sRapportComments;
+	}
+
+	public void setRapportComments(String sRapportComments) {
+		this.sRapportComments = sRapportComments;
+	}
+
+	public String getAppearanceComments() {
+		return sAppearanceComments;
+	}
+
+	public void setAppearanceComments(String sAppearanceComments) {
+		this.sAppearanceComments = sAppearanceComments;
+	}
+
+	public String getMoodComments() {
+		return sMoodComments;
+	}
+
+	public void setMoodComments(String sMoodComments) {
+		this.sMoodComments = sMoodComments;
+	}
+
+	public String getAffectComments() {
+		return sAffectComments;
+	}
+
+	public void setAffectComments(String sAffectComments) {
+		this.sAffectComments = sAffectComments;
+	}
+
+	public String getThoughtComments() {
+		return sThoughtComments;
+	}
+
+	public void setThoughtComments(String sThoughtComments) {
+		this.sThoughtComments = sThoughtComments;
+	}
+
+	public String getPerceptDisturbComments() {
+		return sPerceptDisturbComments;
+	}
+
+	public void setPerceptDisturbComments(String sPerceptDisturbComments) {
+		this.sPerceptDisturbComments = sPerceptDisturbComments;
+	}
+
+	public String getOrientationComments() {
+		return sOrientationComments;
+	}
+
+	public void setOrientationComments(String sOrientationComments) {
+		this.sOrientationComments = sOrientationComments;
+	}
+
+	public String getInsightComments() {
+		return sInsightComments;
+	}
+
+	public void setInsightComments(String sInsightComments) {
+		this.sInsightComments = sInsightComments;
+	}
+
+	public String getJudgementComments() {
+		return sJudgementComments;
+	}
+
+	public void setJudgementComments(String sJudgementComments) {
+		this.sJudgementComments = sJudgementComments;
 	}
 
 }

@@ -29,7 +29,6 @@ import com.act.common.SwingUtils;
 import com.act.common.User;
 import com.act.common.GroupsObj;
 import com.act.common.UsersandGroupsObj;
-import com.sun.jmx.snmp.UserAcl;
 import com.act.server.db.DB;
 
 public class UserProfilePanel extends MHPanel implements ActionListener {

@@ -809,20 +809,46 @@ public class CounsellingSessionPanel extends MHPanel implements ActionListener{
 		taCnslrComments.setText(counsellingSessionObj.getCnslrComments());
 //		cbTherapies.getSelectedItem()); //TODO
 
-		cbOpenCnsling.setSelectedItem(counsellingSessionObj.getOpenToCnsling().toString());
-		cbFutureOutsidePros.setSelectedItem(counsellingSessionObj.getOpentTofutureOutsidePros().toString());
-		cbGrpHome.setSelectedItem(counsellingSessionObj.getOpenTogrpHome().toString());
-		cbAppetite.setSelectedItem(counsellingSessionObj.getAppetite().toString());
-		cbSleep.setSelectedItem(counsellingSessionObj.getSleep().toString());
-		cbRapport.setSelectedItem(counsellingSessionObj.getRapport().toString());
-		cbAppearance.setSelectedItem(counsellingSessionObj.getAppearance().toString());
-		cbMood.setSelectedItem(counsellingSessionObj.getMood().toString());
-		cbAffect.setSelectedItem(counsellingSessionObj.getAffect().toString());
-		cbThought.setSelectedItem(counsellingSessionObj.getThought().toString());
-		cbPerceptDisturb.setSelectedItem(counsellingSessionObj.getPerceptDisturb().toString());
-		cbOrientation.setSelectedItem(counsellingSessionObj.getOrientation().toString());
-		cbInsight.setSelectedItem(counsellingSessionObj.getInsight().toString());
-		cbJudgement.setSelectedItem(counsellingSessionObj.getJudgement().toString());
+		if(counsellingSessionObj.getOpenToCnsling() != null)
+			cbOpenCnsling.setSelectedItem(counsellingSessionObj.getOpenToCnsling().toString());
+		if(counsellingSessionObj.getOpentTofutureOutsidePros() != null)
+			cbFutureOutsidePros.setSelectedItem(counsellingSessionObj.getOpentTofutureOutsidePros().toString());
+		if(counsellingSessionObj.getOpenTogrpHome() != null) 
+			cbGrpHome.setSelectedItem(counsellingSessionObj.getOpenTogrpHome().toString());
+		if (counsellingSessionObj.getAppetite() != null)
+			cbAppetite.setSelectedItem(counsellingSessionObj.getAppetite().toString());
+		if (counsellingSessionObj.getSleep() != null)
+			cbSleep.setSelectedItem(counsellingSessionObj.getSleep().toString());
+		if (counsellingSessionObj.getRapport() != null)
+			cbRapport.setSelectedItem(counsellingSessionObj.getRapport().toString());
+		if (counsellingSessionObj.getAppearance() != null)
+			cbAppearance.setSelectedItem(counsellingSessionObj.getAppearance().toString());
+		if (counsellingSessionObj.getMood() != null)
+			cbMood.setSelectedItem(counsellingSessionObj.getMood().toString());
+		if (counsellingSessionObj.getAffect() != null)
+			cbAffect.setSelectedItem(counsellingSessionObj.getAffect().toString());
+		if (counsellingSessionObj.getThought() != null)
+			cbThought.setSelectedItem(counsellingSessionObj.getThought().toString());
+		if (counsellingSessionObj.getPerceptDisturb() != null)
+			cbPerceptDisturb.setSelectedItem(counsellingSessionObj.getPerceptDisturb().toString());
+		if (counsellingSessionObj.getOrientation() != null)
+			cbOrientation.setSelectedItem(counsellingSessionObj.getOrientation().toString());
+		if (counsellingSessionObj.getInsight() != null)
+			cbInsight.setSelectedItem(counsellingSessionObj.getInsight().toString());
+		if (counsellingSessionObj.getJudgement() != null)
+			cbJudgement.setSelectedItem(counsellingSessionObj.getJudgement().toString());
+		txtAppetite.setText(counsellingSessionObj.getAppetiteComments());
+		txtSleep.setText(counsellingSessionObj.getSleepComments());
+		txtRapport.setText(counsellingSessionObj.getRapportComments());
+		txtAppearance.setText(counsellingSessionObj.getAppearanceComments());
+		txtMood.setText(counsellingSessionObj.getMoodComments());
+		txtAffect.setText(counsellingSessionObj.getAffectComments());
+		txtThought.setText(counsellingSessionObj.getThoughtComments());
+		txtPerceptDisturb.setText(counsellingSessionObj.getPerceptDisturbComments());
+		txtOrientation.setText(counsellingSessionObj.getOrientationComments());
+		txtInsight.setText(counsellingSessionObj.getInsightComments());
+		txtJudgement.setText(counsellingSessionObj.getJudgementComments());
+
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -876,6 +902,17 @@ public class CounsellingSessionPanel extends MHPanel implements ActionListener{
 		counsellingSessionObj.setOrientation(cbOrientation.getSelectedItem().toString());
 		counsellingSessionObj.setInsight(cbInsight.getSelectedItem().toString());
 		counsellingSessionObj.setJudgement(cbJudgement.getSelectedItem().toString());
+		counsellingSessionObj.setAppetiteComments(txtAppetite.getText());
+		counsellingSessionObj.setSleepComments(txtSleep.getText());
+		counsellingSessionObj.setRapportComments(txtRapport.getText());
+		counsellingSessionObj.setAppearanceComments(txtAppearance.getText());
+		counsellingSessionObj.setMoodComments(txtMood.getText());
+		counsellingSessionObj.setAffectComments(txtAffect.getText());
+		counsellingSessionObj.setThoughtComments(txtThought.getText());
+		counsellingSessionObj.setPerceptDisturbComments(txtPerceptDisturb.getText());
+		counsellingSessionObj.setOrientationComments(txtOrientation.getText());
+		counsellingSessionObj.setInsightComments(txtInsight.getText());
+		counsellingSessionObj.setJudgementComments(txtJudgement.getText());
 		
 	}
 	

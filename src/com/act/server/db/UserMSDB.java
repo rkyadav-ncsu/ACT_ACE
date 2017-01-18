@@ -721,7 +721,7 @@ public class UserMSDB extends UserDB {
 		Connection con = null;
 		String sql = "Select * from " + DB_TBL_USERSANDGROUPS +
 				" Where " + DB_COL_USER_GRP_USRID + " = '" + cnslrID + "'" 
-				+" and " + DB_COL_USER_GRP_GRPNAME + " = '" + "ADMIN'";
+				+" and " + DB_COL_USER_GRP_GRPNAME + " = '" + "Administrator'";
 
 		
 		

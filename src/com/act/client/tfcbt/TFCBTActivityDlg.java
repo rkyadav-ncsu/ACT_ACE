@@ -100,7 +100,7 @@ public class TFCBTActivityDlg extends JDialog implements ActionListener{
 			
 			taActivityDesc = new JTextArea();
 			JScrollPane scrollDesc = new JScrollPane(taActivityDesc);
-//			scrollDesc.setPreferredSize(new Dimension (150, 100));
+			scrollDesc.setPreferredSize(new Dimension (200, 100));
 			taActivityDesc.setEditable(false);
 			panelCenter.add(scrollDesc, SwingUtils.getConstraints(1, 0, 1, 1,1,
 					GridBagConstraints.WEST, 
